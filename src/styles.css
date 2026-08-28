@@ -42,6 +42,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-variant: var(--surface-variant);
   --color-glass: var(--glass);
   --color-glass-border: var(--glass-border);
   --color-brand-1: var(--brand-1);
