@@ -7,7 +7,7 @@ export function PoweredByFooter() {
         href="https://nightwakertecnologia.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="glass pointer-events-auto flex items-center gap-2 rounded-full px-4 py-2 text-muted-foreground transition hover:text-foreground"
+        className="pointer-events-auto flex items-center gap-2 text-muted-foreground transition hover:text-foreground"
       >
         <span className="text-[10px] uppercase tracking-widest">Powered by</span>
         <img
