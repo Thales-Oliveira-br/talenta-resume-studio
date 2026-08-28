@@ -16,13 +16,13 @@ export async function extractTextFromFile(file: File): Promise<string> {
       const content = await page.getTextContent();
       let linha = "";
       let ultimoY: number | null = null;
-      for (const item of content.items as Array<{ str: string; transform: number[] }>) {
-        const y = Math.round(item.transform[5]);
+      for (const item of content.items as Array<{ str?: string; transform?: number[] }>) {
+        const y = Math.round(item.transform?.[5] ?? 0);
         if (ultimoY !== null && Math.abs(y - ultimoY) > 3) {
           partes.push(linha.trim());
           linha = "";
         }
-        linha += item.str + " ";
+        linha += (item.str ?? "") + " ";
         ultimoY = y;
       }
       if (linha.trim()) partes.push(linha.trim());
@@ -32,10 +32,12 @@ export async function extractTextFromFile(file: File): Promise<string> {
   }
 
   if (name.endsWith(".docx") || name.endsWith(".doc")) {
-    const mammoth = await import("mammoth/mammoth.browser.js");
-    const result = await (mammoth as unknown as {
+    const mammoth = (await import(
+      /* @vite-ignore */ "mammoth/mammoth.browser.js"
+    )) as unknown as {
       extractRawText: (o: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }>;
-    }).extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    };
+    const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
     return result.value.trim();
   }
 
