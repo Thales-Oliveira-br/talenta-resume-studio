@@ -61,6 +61,8 @@ function TalentaApp() {
   const [relato, setRelato] = useState("");
   const [arrastando, setArrastando] = useState(false);
   const [dados, setDados] = useState<Curriculo | null>(null);
+  const [falha, setFalha] = useState<string | null>(null);
+
   const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -237,7 +239,14 @@ function TalentaApp() {
               </>
             )}
           </Button>
+
+          {falha && (
+            <p className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {falha}
+            </p>
+          )}
         </section>
+
 
         {dados && (
           <section className="glass mt-8 space-y-5 rounded-3xl p-6 sm:p-8">
