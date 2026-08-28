@@ -123,9 +123,17 @@ function LoginPage() {
               />
             </div>
 
+            {erro && <p className="text-xs font-medium text-destructive">{erro}</p>}
+
             <Button type="submit" className="w-full font-semibold">
               Entrar no sistema
             </Button>
+
+            <p className="text-center text-xs text-muted-foreground">
+              Acesso padrão: <span className="font-semibold text-foreground">admin</span> /{" "}
+              <span className="font-semibold text-foreground">nightwaker2026</span>
+            </p>
+
           </form>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
