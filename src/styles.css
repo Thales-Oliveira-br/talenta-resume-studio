@@ -143,40 +143,34 @@
 /* Painel de vidro principal */
 @utility glass {
   background: var(--glass);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
   border: 1px solid var(--glass-border);
   box-shadow:
-    0 1px 0 0 oklch(1 0 0 / 10%) inset,
-    0 24px 60px -24px oklch(0 0 0 / 60%);
+    0 1px 0 0 hsl(230 30% 80% / 12%) inset,
+    0 24px 60px -24px hsl(0 0% 0% / 80%);
 }
 
 /* Vidro mais discreto para itens internos */
 @utility glass-soft {
-  background: oklch(1 0 0 / 6%);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  border: 1px solid oklch(1 0 0 / 12%);
+  background: hsl(230 24% 14% / 55%);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid hsl(230 20% 40% / 28%);
 }
 
 @utility glass-input {
-  background: oklch(1 0 0 / 8%);
+  background: hsl(230 22% 14% / 65%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid oklch(1 0 0 / 16%);
-  box-shadow: 0 1px 2px oklch(0 0 0 / 30%) inset;
+  border: 1px solid hsl(230 20% 40% / 30%);
 }
 
 @utility text-brand-gradient {
-  background: linear-gradient(
-    100deg,
-    var(--brand-1),
-    var(--brand-2) 40%,
-    var(--brand-3) 75%,
-    var(--brand-4)
-  );
+  background: linear-gradient(100deg, hsl(230 24% 92%), hsl(230 30% 66%) 55%, hsl(230 40% 55%));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
+
 
