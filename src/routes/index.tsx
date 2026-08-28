@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FileText, Download, Loader2, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
+import { estaLogado, sair } from "@/lib/session";
 import { padronizarCurriculo } from "@/lib/resume.functions";
 import type { Curriculo } from "@/lib/resume-types";
 
@@ -62,6 +63,11 @@ function TalentaApp() {
   const [dados, setDados] = useState<Curriculo | null>(null);
   const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!estaLogado()) navigate({ to: "/login", replace: true });
+  }, [navigate]);
 
   const padronizar = useServerFn(padronizarCurriculo);
 
@@ -109,8 +115,16 @@ function TalentaApp() {
             <p className="text-xs text-muted-foreground">Seu talento. No formato certo.</p>
           </div>
         </div>
-        <Button asChild variant="ghost" size="sm" className="rounded-xl">
-          <Link to="/login">Sair</Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="rounded-xl"
+          onClick={() => {
+            sair();
+            navigate({ to: "/login", replace: true });
+          }}
+        >
+          Sair
         </Button>
       </header>
 

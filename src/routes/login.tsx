@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ErsLogo } from "@/components/ErsLogo";
+import { entrar } from "@/lib/session";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,6 +59,7 @@ function LoginPage() {
           className="glass w-full max-w-sm space-y-5 rounded-3xl p-8"
           onSubmit={(e) => {
             e.preventDefault();
+            entrar();
             navigate({ to: "/" });
           }}
         >
