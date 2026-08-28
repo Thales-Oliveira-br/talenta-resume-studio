@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { FileText, Download, Loader2, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
+import { ErsLogo, ERS_LOGO_URL, NIGHTWAKER_LOGO_URL } from "@/components/ErsLogo";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
