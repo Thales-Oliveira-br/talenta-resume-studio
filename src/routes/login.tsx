@@ -69,7 +69,7 @@ function LoginPage() {
           <div className="text-center">
             <img
               src={LOGO_URL}
-              alt="Night Tracker — Tecnologia e Informação"
+              alt="NIGHTWAKER — Tecnologia e Informação"
               width={450}
               height={220}
               className="mx-auto h-16 w-auto object-contain brightness-0 invert"
