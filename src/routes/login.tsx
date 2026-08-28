@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { PoweredByFooter } from "@/components/PoweredByFooter";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +44,7 @@ function LoginPage() {
   }, [navigate]);
 
   return (
-    <main className="relative grid min-h-screen grid-cols-1 lg:grid-cols-2">
+    <main className="relative grid min-h-screen pb-16 grid-cols-1 lg:grid-cols-2">
       <TalentaBackdrop />
 
       {/* Painel de marca */}
@@ -74,7 +76,7 @@ function LoginPage() {
               alt="NIGHTWAKER — Tecnologia e Informação"
               width={450}
               height={220}
-              className="mx-auto h-16 w-auto object-contain brightness-0 invert"
+              className="mx-auto h-16 w-auto object-contain brightness-0 dark:invert"
             />
             <p className="mt-6 text-5xl font-bold tracking-tight text-foreground">Talenta</p>
             <div className="mx-auto mt-3 h-1 w-16 bg-primary" />
