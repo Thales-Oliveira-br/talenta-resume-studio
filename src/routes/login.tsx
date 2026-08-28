@@ -5,7 +5,7 @@ import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { entrar, estaLogado } from "@/lib/session";
+import { entrar, estaLogado, validarCredenciais } from "@/lib/session";
 
 const LOGO_URL = "/nighttracker-logo.png";
 
@@ -34,6 +34,8 @@ function LoginPage() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
+
 
   useEffect(() => {
     if (estaLogado()) navigate({ to: "/", replace: true });
