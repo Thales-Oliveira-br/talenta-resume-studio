@@ -75,14 +75,26 @@ function TalentaApp() {
     mutationFn: async () => {
       if (!arquivo) throw new Error("Selecione um currículo.");
       const texto = await extractTextFromFile(arquivo);
+      if (texto.trim().length < 30) {
+        throw new Error(
+          "Não foi possível ler texto neste arquivo (pode ser um PDF digitalizado/imagem). Envie um PDF com texto selecionável, DOCX ou TXT.",
+        );
+      }
       return padronizar({ data: { texto, relato } });
     },
     onSuccess: (resultado) => {
+      setFalha(null);
       setDados(resultado as Curriculo);
       toast.success("Currículo padronizado no modelo da empresa.");
     },
-    onError: (erro: Error) => toast.error(erro.message),
+    onError: (erro: Error) => {
+      console.error("[Talenta] falha ao padronizar:", erro);
+      const msg = erro.message || "Não foi possível padronizar o currículo.";
+      setFalha(msg);
+      toast.error(msg);
+    },
   });
+
 
   const exportar = async (formato: "docx" | "pdf") => {
     if (!dados) return;
