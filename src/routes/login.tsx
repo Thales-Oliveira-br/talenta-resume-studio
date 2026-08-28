@@ -72,7 +72,7 @@ function LoginPage() {
               alt="Night Tracker — Tecnologia e Informação"
               width={450}
               height={220}
-              className="mx-auto h-16 w-auto object-contain"
+              className="mx-auto h-16 w-auto object-contain brightness-0 invert"
             />
             <p className="mt-6 text-5xl font-bold tracking-tight text-foreground">Talenta</p>
             <div className="mx-auto mt-3 h-1 w-16 bg-primary" />
