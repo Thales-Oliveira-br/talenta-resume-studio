@@ -5,7 +5,7 @@ import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { entrar, estaLogado } from "@/lib/session";
+import { entrar, estaLogado, validarCredenciais } from "@/lib/session";
 
 const LOGO_URL = "/nighttracker-logo.png";
 
@@ -34,6 +34,8 @@ function LoginPage() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
+
 
   useEffect(() => {
     if (estaLogado()) navigate({ to: "/", replace: true });
@@ -69,7 +71,7 @@ function LoginPage() {
           <div className="text-center">
             <img
               src={LOGO_URL}
-              alt="Night Tracker — Tecnologia e Informação"
+              alt="NIGHTWAKER — Tecnologia e Informação"
               width={450}
               height={220}
               className="mx-auto h-16 w-auto object-contain brightness-0 invert"
@@ -83,10 +85,16 @@ function LoginPage() {
             className="mt-8 space-y-5"
             onSubmit={(e) => {
               e.preventDefault();
+              if (!validarCredenciais(usuario, senha)) {
+                setErro("Usuário ou senha inválidos.");
+                return;
+              }
+              setErro("");
               entrar();
               navigate({ to: "/", replace: true });
             }}
           >
+
             <div className="space-y-2">
               <Label htmlFor="usuario" className="text-xs font-semibold">
                 Usuário
@@ -115,9 +123,17 @@ function LoginPage() {
               />
             </div>
 
+            {erro && <p className="text-xs font-medium text-destructive">{erro}</p>}
+
             <Button type="submit" className="w-full font-semibold">
               Entrar no sistema
             </Button>
+
+            <p className="text-center text-xs text-muted-foreground">
+              Acesso padrão: <span className="font-semibold text-foreground">admin</span> /{" "}
+              <span className="font-semibold text-foreground">nightwaker2026</span>
+            </p>
+
           </form>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">

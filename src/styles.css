@@ -61,7 +61,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Paleta Night Tracker (idêntica ao Archiva e ao Signa) */
+/* Paleta NIGHTWAKER (idêntica ao Archiva e ao Signa) */
 :root,
 .dark {
   --radius: 0.5rem;
@@ -89,7 +89,7 @@
   --input: hsl(230 20% 20%);
   --ring: hsl(230 30% 66%);
 
-  /* vidro sobre a paleta Night Tracker */
+  /* vidro sobre a paleta NIGHTWAKER */
   --glass: hsl(230 24% 10% / 55%);
   --glass-border: hsl(230 20% 40% / 35%);
 
