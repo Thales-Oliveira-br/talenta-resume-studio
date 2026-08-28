@@ -1,12 +1,16 @@
 const CHAVE = "talenta-sessao";
 
-/** Credenciais padrão de uso da ferramenta (uso interno). */
-export const USUARIO_PADRAO = "admin";
-export const SENHA_PADRAO = "nightwaker2026";
+/** Credenciais liberadas para uso da ferramenta (uso interno). */
+const CREDENCIAIS: Array<{ usuario: string; senha: string }> = [
+  { usuario: "admin", senha: "nightwaker2026" },
+  { usuario: "elizabete@elizabetescain.com.br", senha: "123@abc" },
+];
 
 export function validarCredenciais(usuario: string, senha: string) {
-  return usuario.trim().toLowerCase() === USUARIO_PADRAO && senha === SENHA_PADRAO;
+  const login = usuario.trim().toLowerCase();
+  return CREDENCIAIS.some((c) => c.usuario === login && c.senha === senha);
 }
+
 
 
 export function entrar() {
