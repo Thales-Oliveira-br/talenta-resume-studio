@@ -131,9 +131,20 @@ function LoginPage() {
 
           </form>
 
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            Talenta — Seu talento. No formato certo.
-          </p>
+          <a
+            href="https://nightwakertecnologia.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground transition hover:text-foreground"
+          >
+            <span className="uppercase tracking-widest">Powered by</span>
+            <img
+              src={LOGO_URL}
+              alt="NIGHTWAKER Tecnologia"
+              className="h-5 w-auto object-contain brightness-0 invert"
+              loading="lazy"
+            />
+          </a>
         </div>
       </section>
     </main>
