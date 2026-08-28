@@ -32,14 +32,11 @@ export async function extractTextFromFile(file: File): Promise<string> {
   }
 
   if (name.endsWith(".docx") || name.endsWith(".doc")) {
-    const mammoth = (await import(
-      /* @vite-ignore */ "mammoth/mammoth.browser.js"
-    )) as unknown as {
-      extractRawText: (o: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }>;
-    };
+    const mammoth = await import("mammoth/mammoth.browser.js");
     const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
     return result.value.trim();
   }
+
 
   if (name.endsWith(".txt") || name.endsWith(".rtf") || name.endsWith(".md")) {
     return (await file.text()).trim();

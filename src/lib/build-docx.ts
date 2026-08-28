@@ -54,27 +54,38 @@ function corpo(
 }
 
 export async function gerarDocx(dados: Curriculo, logoUrl: string): Promise<Blob> {
-  const logo = new Uint8Array(await (await fetch(logoUrl)).arrayBuffer());
+  let logo: Uint8Array | null = null;
+  try {
+    const resposta = await fetch(logoUrl);
+    if (resposta.ok && (resposta.headers.get("content-type") ?? "").startsWith("image/")) {
+      logo = new Uint8Array(await resposta.arrayBuffer());
+    }
+  } catch {
+    logo = null;
+  }
 
   const header = new Header({
     children: [
       new Paragraph({
         alignment: AlignmentType.RIGHT,
-        children: [
-          new ImageRun({
-            type: "png",
-            data: logo,
-            transformation: { width: 150, height: 48 },
-            altText: {
-              title: "Elizabete Rosa Scain",
-              description: "Elizabete Rosa Scain — Desenvolvimento Humano",
-              name: "Logo ERS",
-            },
-          }),
-        ],
+        children: logo
+          ? [
+              new ImageRun({
+                type: "png",
+                data: logo,
+                transformation: { width: 150, height: 48 },
+                altText: {
+                  title: "Elizabete Rosa Scain",
+                  description: "Elizabete Rosa Scain — Desenvolvimento Humano",
+                  name: "Logo ERS",
+                },
+              }),
+            ]
+          : [],
       }),
     ],
   });
+
 
   const footer = new Footer({
     children: [

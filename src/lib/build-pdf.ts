@@ -6,34 +6,42 @@ const LARGURA = 210;
 const ALTURA = 297;
 const LIMITE = ALTURA - 24;
 
-async function carregarLogo(url: string): Promise<{ dataUrl: string; ratio: number }> {
-  const blob = await (await fetch(url)).blob();
-  const dataUrl = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-  const ratio = await new Promise<number>((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(img.width / img.height);
-    img.onerror = () => resolve(3.15);
-    img.src = dataUrl;
-  });
-  return { dataUrl, ratio };
+async function carregarLogo(url: string): Promise<{ dataUrl: string; ratio: number } | null> {
+  try {
+    const resposta = await fetch(url);
+    if (!resposta.ok) return null;
+    const blob = await resposta.blob();
+    if (!blob.type.startsWith("image/")) return null;
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+    const ratio = await new Promise<number>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img.width / img.height);
+      img.onerror = () => resolve(3.15);
+      img.src = dataUrl;
+    });
+    return { dataUrl, ratio };
+  } catch {
+    return null;
+  }
 }
 
 export async function gerarPdf(dados: Curriculo, logoUrl: string): Promise<Blob> {
-  const { dataUrl, ratio } = await carregarLogo(logoUrl);
+  const logo = await carregarLogo(logoUrl);
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const largura = LARGURA - M * 2;
   let y = M;
 
   const logoW = 42;
-  const logoH = logoW / ratio;
+  const logoH = logo ? logoW / logo.ratio : 13;
 
   const enfeitarPagina = () => {
-    doc.addImage(dataUrl, "PNG", LARGURA - M - logoW, 8, logoW, logoH);
+    if (logo) doc.addImage(logo.dataUrl, "PNG", LARGURA - M - logoW, 8, logoW, logoH);
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(40);
