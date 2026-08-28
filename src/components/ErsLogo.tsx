@@ -1,11 +1,10 @@
-import logo from "@/assets/ers-logo.png.asset.json";
-
-export const ERS_LOGO_URL = logo.url;
+export const ERS_LOGO_URL = "/ers-logo.png";
+export const NIGHTWAKER_LOGO_URL = "/nighttracker-logo.png";
 
 export function ErsLogo({ className }: { className?: string }) {
   return (
     <img
-      src={logo.url}
+      src={ERS_LOGO_URL}
       alt="Elizabete Rosa Scain — Desenvolvimento Humano"
       className={className}
       loading="eager"
