@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { FileText, Download, Loader2, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { ErsLogo, ERS_LOGO_URL, NIGHTWAKER_LOGO_URL } from "@/components/ErsLogo";
+import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
+import { PoweredByFooter } from "@/components/PoweredByFooter";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -121,35 +123,20 @@ function TalentaApp() {
     <div className="relative min-h-screen">
       <TalentaBackdrop />
 
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 rounded-b-3xl bg-white px-6 py-4 shadow-sm">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-4 rounded-b-3xl border-b border-glass-border bg-transparent px-6 py-4 backdrop-blur-xl">
         <div className="flex items-center gap-4">
           <ErsLogo className="h-9 w-auto" />
           <div className="hidden sm:block">
-            <p className="font-display text-lg font-semibold leading-none text-black">Talenta</p>
-            <p className="text-xs text-neutral-600">Seu talento. No formato certo.</p>
+            <p className="font-display text-lg font-semibold leading-none">Talenta</p>
+            <p className="text-xs text-muted-foreground">Seu talento. No formato certo.</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <a
-            href="https://nightwakertecnologia.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-neutral-600 transition hover:text-black"
-          >
-            <span className="hidden text-[10px] uppercase tracking-widest sm:inline">
-              Powered by
-            </span>
-            <img
-              src={NIGHTWAKER_LOGO_URL}
-              alt="NIGHTWAKER Tecnologia"
-              className="h-6 w-auto"
-              loading="lazy"
-            />
-          </a>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="sm"
-            className="rounded-xl text-black hover:bg-neutral-100 hover:text-black"
+            className="rounded-xl"
             onClick={() => {
               sair();
               navigate({ to: "/login", replace: true });
@@ -160,7 +147,8 @@ function TalentaApp() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl px-6 py-12">
+
+      <main className="mx-auto w-full max-w-3xl px-6 pb-28 pt-12">
         <h1 className="font-display text-3xl font-semibold sm:text-4xl">
           Padronize um <span className="text-brand-gradient">currículo</span>
         </h1>
@@ -348,6 +336,8 @@ function TalentaApp() {
           </section>
         )}
       </main>
+
+      <PoweredByFooter />
     </div>
   );
 }
