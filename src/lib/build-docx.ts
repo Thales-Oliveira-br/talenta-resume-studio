@@ -22,13 +22,15 @@ const CONTATO = {
   assinatura: "Elizabete Rosa Sacain",
 };
 
+type Alinhamento = (typeof AlignmentType)[keyof typeof AlignmentType];
+
 function texto(t: string, opts: { bold?: boolean; italics?: boolean; underline?: boolean; size?: number } = {}) {
   return new TextRun({
     text: t,
     font: FONTE,
     size: opts.size ?? 22,
-    bold: opts.bold,
-    italics: opts.italics,
+    bold: opts.bold === true,
+    italics: opts.italics === true,
     ...(opts.underline ? { underline: { type: UnderlineType.SINGLE } } : {}),
   });
 }
@@ -40,11 +42,14 @@ function secao(titulo: string) {
   });
 }
 
-function corpo(t: string, opts: { bold?: boolean; italics?: boolean; align?: (typeof AlignmentType)[keyof typeof AlignmentType] } = {}) {
+function corpo(
+  t: string,
+  opts: { bold?: boolean; italics?: boolean; align?: Alinhamento } = {},
+) {
   return new Paragraph({
-    alignment: opts.align,
+    ...(opts.align ? { alignment: opts.align } : {}),
     spacing: { after: 0, line: 264 },
-    children: [texto(t, { bold: opts.bold, italics: opts.italics })],
+    children: [texto(t, { bold: opts.bold === true, italics: opts.italics === true })],
   });
 }
 
