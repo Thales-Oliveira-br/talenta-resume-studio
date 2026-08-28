@@ -13,7 +13,7 @@ export function PoweredByFooter() {
         <img
           src={NIGHTWAKER_LOGO_URL}
           alt="NIGHTWAKER Tecnologia"
-          className="h-5 w-auto dark:invert-0"
+          className="h-5 w-auto dark:invert"
           loading="lazy"
         />
       </a>
