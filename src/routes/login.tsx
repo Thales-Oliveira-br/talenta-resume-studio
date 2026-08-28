@@ -83,10 +83,16 @@ function LoginPage() {
             className="mt-8 space-y-5"
             onSubmit={(e) => {
               e.preventDefault();
+              if (!validarCredenciais(usuario, senha)) {
+                setErro("Usuário ou senha inválidos.");
+                return;
+              }
+              setErro("");
               entrar();
               navigate({ to: "/", replace: true });
             }}
           >
+
             <div className="space-y-2">
               <Label htmlFor="usuario" className="text-xs font-semibold">
                 Usuário
