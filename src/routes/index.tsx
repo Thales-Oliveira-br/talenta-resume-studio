@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { FileText, Download, Loader2, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { ErsLogo, ERS_LOGO_URL, NIGHTWAKER_LOGO_URL } from "@/components/ErsLogo";
+import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
+import { PoweredByFooter } from "@/components/PoweredByFooter";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -146,7 +148,7 @@ function TalentaApp() {
       </header>
 
 
-      <main className="mx-auto w-full max-w-3xl px-6 py-12">
+      <main className="mx-auto w-full max-w-3xl px-6 pb-28 pt-12">
         <h1 className="font-display text-3xl font-semibold sm:text-4xl">
           Padronize um <span className="text-brand-gradient">currículo</span>
         </h1>
@@ -334,6 +336,8 @@ function TalentaApp() {
           </section>
         )}
       </main>
+
+      <PoweredByFooter />
     </div>
   );
 }
