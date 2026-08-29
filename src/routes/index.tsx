@@ -65,7 +65,7 @@ function TalentaApp() {
   const [dados, setDados] = useState<Curriculo | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
 
-  const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
+  const [exportando, setExportando] = useState<"docx" | "pdf" | "print" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
