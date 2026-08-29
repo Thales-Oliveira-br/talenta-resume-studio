@@ -32,7 +32,7 @@ jobs:
       # 3. Instala as dependencias
       # (Usa 'npm install' para suportar repos sem package-lock.json)
       - name: "Instalar Dependencias"
-        run: npm install
+        uses: npm install
       
       # 4. Roda o script de build (que deve gerar a pasta 'dist')
       - name: "Rodar Build"
