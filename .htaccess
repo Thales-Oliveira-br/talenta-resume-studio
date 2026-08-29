@@ -1,15 +1,15 @@
-# TanStack Start SPA hospedado em Apache
 DirectoryIndex _shell.html
 
 RewriteEngine On
 
-# SPA fallback: rotas inexistentes caem no _shell.html
+# Arquivos existentes, incluindo pdf.worker.min.js, devem ser
+# entregues diretamente e nao cair no fallback da SPA.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ _shell.html [L]
 
-# O pdfjs usa um Web Worker em modulo ES (.mjs).
-# O Apache precisa servi-lo com um MIME JavaScript valido para import() funcionar.
+# PDF.js worker e JavaScript ES Module.
+AddType text/javascript .js
 AddType text/javascript .mjs
 
 <IfModule mod_headers.c>
