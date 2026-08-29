@@ -100,6 +100,38 @@ function TalentaApp() {
   });
 
 
+  const imprimir = async () => {
+    if (!dados) return;
+    setExportando("print");
+    try {
+      const registro = { ...dados, entrevista: relato.trim() || dados.entrevista };
+      const { gerarPdf } = await import("@/lib/build-pdf");
+      const blob = await gerarPdf(registro, ERS_LOGO_URL);
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "0";
+      iframe.src = url;
+      iframe.onload = () => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      };
+      document.body.appendChild(iframe);
+      window.setTimeout(() => {
+        URL.revokeObjectURL(url);
+        iframe.remove();
+      }, 60_000);
+    } catch (erro) {
+      toast.error((erro as Error).message || "Não foi possível preparar a impressão.");
+    } finally {
+      setExportando(null);
+    }
+  };
+
   const exportar = async (formato: "docx" | "pdf") => {
     if (!dados) return;
     setExportando(formato);
