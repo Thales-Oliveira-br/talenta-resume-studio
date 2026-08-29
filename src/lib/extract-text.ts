@@ -6,8 +6,13 @@ export async function extractTextFromFile(file: File): Promise<string> {
 
   if (name.endsWith(".pdf")) {
     const pdfjs = await import("pdfjs-dist");
-    const workerUrl = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
-    pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+
+    // O deploy do Talenta é estático em Apache. Em vez de deixar o Vite
+    // gerar um asset .mjs com nome hash, usamos uma cópia estável do worker
+    // em /pdf.worker.min.js, criada pelo workflow de deploy. Isso evita
+    // problemas de MIME/roteamento do Apache com módulos .mjs.
+    pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
+
     const data = new Uint8Array(await file.arrayBuffer());
     const doc = await pdfjs.getDocument({ data }).promise;
     const partes: string[] = [];
@@ -36,7 +41,6 @@ export async function extractTextFromFile(file: File): Promise<string> {
     const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
     return result.value.trim();
   }
-
 
   if (name.endsWith(".txt") || name.endsWith(".rtf") || name.endsWith(".md")) {
     return (await file.text()).trim();
