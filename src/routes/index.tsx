@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { FileText, FileType, Loader2, Printer, Sparkles, Upload, X } from "lucide-react";
+import { FileText, Download, Loader2, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
@@ -65,7 +65,7 @@ function TalentaApp() {
   const [dados, setDados] = useState<Curriculo | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
 
-  const [exportando, setExportando] = useState<"docx" | "pdf" | "print" | null>(null);
+  const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -99,38 +99,6 @@ function TalentaApp() {
     },
   });
 
-
-  const imprimir = async () => {
-    if (!dados) return;
-    setExportando("print");
-    try {
-      const registro = { ...dados, entrevista: relato.trim() || dados.entrevista };
-      const { gerarPdf } = await import("@/lib/build-pdf");
-      const blob = await gerarPdf(registro, ERS_LOGO_URL);
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "fixed";
-      iframe.style.right = "0";
-      iframe.style.bottom = "0";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "0";
-      iframe.src = url;
-      iframe.onload = () => {
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
-      };
-      document.body.appendChild(iframe);
-      window.setTimeout(() => {
-        URL.revokeObjectURL(url);
-        iframe.remove();
-      }, 60_000);
-    } catch (erro) {
-      toast.error((erro as Error).message || "Não foi possível preparar a impressão.");
-    } finally {
-      setExportando(null);
-    }
-  };
 
   const exportar = async (formato: "docx" | "pdf") => {
     if (!dados) return;
@@ -295,7 +263,7 @@ function TalentaApp() {
                   {[dados.cidade, dados.telefone, dados.email].filter(Boolean).join(" · ")}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2">
                 <Button
                   variant="secondary"
                   className="rounded-xl"
@@ -305,7 +273,7 @@ function TalentaApp() {
                   {exportando === "docx" ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <FileText className="size-4" />
+                    <Download className="size-4" />
                   )}
                   .docx
                 </Button>
@@ -317,22 +285,9 @@ function TalentaApp() {
                   {exportando === "pdf" ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <FileType className="size-4" />
+                    <Download className="size-4" />
                   )}
                   .pdf
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-xl"
-                  disabled={exportando !== null}
-                  onClick={() => imprimir()}
-                >
-                  {exportando === "print" ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Printer className="size-4" />
-                  )}
-                  Imprimir
                 </Button>
               </div>
             </div>
