@@ -28,22 +28,9 @@ jobs:
       - name: "Rodar Build"
         run: npm run build
 
-      # Copia o worker do PDF.js para um caminho estavel com extensao .js.
-      # O worker continua sendo um modulo ES, mas nao depende do nome hash
-      # nem do tratamento de .mjs pelo Apache.
-      - name: "Preparar worker do PDF.js"
-        run: |
-          if [ -f node_modules/pdfjs-dist/build/pdf.worker.min.mjs ]; then
-            cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs dist/client/pdf.worker.min.js
-          elif [ -f node_modules/pdfjs-dist/build/pdf.worker.min.mjs ]; then
-            cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs dist/pdf.worker.min.js
-          else
-            echo "::error::Worker do PDF.js nao encontrado em node_modules/pdfjs-dist/build/"
-            exit 1
-          fi
-
       - name: "Localizar shell SPA do TanStack Start"
         id: locate-shell
+        shell: bash
         run: |
           if [ -f dist/client/_shell.html ]; then
             echo "deploy_dir=dist/client" >> "$GITHUB_OUTPUT"
@@ -51,28 +38,51 @@ jobs:
             echo "deploy_dir=dist" >> "$GITHUB_OUTPUT"
           else
             echo "::error::_shell.html nao encontrado em dist/ ou dist/client/."
+            find dist -maxdepth 3 -type f | sort | head -200 || true
             exit 1
           fi
 
-      # Se o build estiver em dist/, move o worker para a raiz desse deploy.
-      - name: "Garantir worker no diretorio de deploy"
+      # PDF.js 6 usa um Web Worker ES Module. O deploy e estatico em Apache,
+      # portanto colocamos uma copia com caminho fixo diretamente na raiz do
+      # diretorio que sera publicado. Nao dependemos de asset hash do Vite.
+      - name: "Instalar worker PDF.js no diretorio publicado"
+        shell: bash
         run: |
-          if [ "${{ steps.locate-shell.outputs.deploy_dir }}" = "dist" ] && [ -f dist/client/pdf.worker.min.js ]; then
-            mv dist/client/pdf.worker.min.js dist/pdf.worker.min.js
+          DEPLOY_DIR="${{ steps.locate-shell.outputs.deploy_dir }}"
+          WORKER="node_modules/pdfjs-dist/build/pdf.worker.min.mjs"
+
+          if [ ! -f "$WORKER" ]; then
+            echo "::error::Worker do PDF.js nao encontrado: $WORKER"
+            find node_modules/pdfjs-dist -maxdepth 3 -type f -iname '*worker*' | sort || true
+            exit 1
           fi
 
+          cp "$WORKER" "$DEPLOY_DIR/pdf.worker.min.js"
+
+          if [ ! -s "$DEPLOY_DIR/pdf.worker.min.js" ]; then
+            echo "::error::Falha ao copiar pdf.worker.min.js para $DEPLOY_DIR"
+            exit 1
+          fi
+
+          echo "Worker publicado em: $DEPLOY_DIR/pdf.worker.min.js"
+          ls -lh "$DEPLOY_DIR/pdf.worker.min.js"
+
       - name: "Gerar .htaccess para Apache"
+        shell: bash
         run: |
-          cat > "${{ steps.locate-shell.outputs.deploy_dir }}/.htaccess" <<'HTACCESS'
+          DEPLOY_DIR="${{ steps.locate-shell.outputs.deploy_dir }}"
+          cat > "$DEPLOY_DIR/.htaccess" <<'HTACCESS'
           DirectoryIndex _shell.html
 
           RewriteEngine On
 
+          # Arquivos existentes, incluindo pdf.worker.min.js, devem ser
+          # entregues diretamente e nao cair no fallback da SPA.
           RewriteCond %{REQUEST_FILENAME} !-f
           RewriteCond %{REQUEST_FILENAME} !-d
           RewriteRule ^ _shell.html [L]
 
-          # PDF.js worker: caminho estavel e MIME JavaScript.
+          # PDF.js worker e JavaScript ES Module.
           AddType text/javascript .js
           AddType text/javascript .mjs
 
@@ -89,6 +99,15 @@ jobs:
             AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml
           </IfModule>
           HTACCESS
+
+      - name: "Verificar artefato de deploy"
+        shell: bash
+        run: |
+          DEPLOY_DIR="${{ steps.locate-shell.outputs.deploy_dir }}"
+          test -f "$DEPLOY_DIR/_shell.html"
+          test -s "$DEPLOY_DIR/pdf.worker.min.js"
+          echo "Conteudo do deploy:"
+          ls -lah "$DEPLOY_DIR" | head -100
 
       - name: "Deploy para a Branch stable-website"
         uses: JamesIves/github-pages-deploy-action@v4
