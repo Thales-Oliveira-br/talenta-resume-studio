@@ -51,7 +51,7 @@ jobs:
             exit 1
           fi
 
-      # 5.1. Gera .htaccess para hospedagens Apache (DirectoryIndex + SPA fallback)
+      # 5.1. Gera .htaccess para hospedagens Apache (DirectoryIndex + SPA fallback + MIME de modulos ES)
       - name: "Gerar .htaccess para Apache"
         run: |
           cat > "${{ steps.locate-shell.outputs.deploy_dir }}/.htaccess" <<'HTACCESS'
@@ -65,17 +65,21 @@ jobs:
           RewriteCond %{REQUEST_FILENAME} !-d
           RewriteRule ^ _shell.html [L]
 
+          # O pdfjs usa um Web Worker em modulo ES (.mjs).
+          # O Apache precisa servi-lo com um MIME JavaScript valido para import() funcionar.
+          AddType text/javascript .mjs
+
           <IfModule mod_headers.c>
             <FilesMatch "_shell\.html$">
               Header set Cache-Control "no-cache, no-store, must-revalidate"
             </FilesMatch>
-            <FilesMatch "\.(?:js|css|woff2|woff|svg|png|jpg|jpeg|webp|gif|ico)$">
+            <FilesMatch "\.(?:js|mjs|css|woff2|woff|svg|png|jpg|jpeg|webp|gif|ico)$">
               Header set Cache-Control "public, max-age=31536000, immutable"
             </FilesMatch>
           </IfModule>
 
           <IfModule mod_deflate.c>
-            AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+            AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml
           </IfModule>
           HTACCESS
 
