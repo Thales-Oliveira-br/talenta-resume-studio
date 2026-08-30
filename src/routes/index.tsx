@@ -295,7 +295,20 @@ function TalentaApp() {
                   {[dados.cidade, dados.telefone, dados.email].filter(Boolean).join(" · ")}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  disabled={exportando !== null}
+                  onClick={imprimir}
+                >
+                  {exportando === "print" ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Printer className="size-4" />
+                  )}
+                  Imprimir
+                </Button>
                 <Button
                   variant="secondary"
                   className="rounded-xl"
@@ -305,7 +318,7 @@ function TalentaApp() {
                   {exportando === "docx" ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <Download className="size-4" />
+                    <FileText className="size-4" />
                   )}
                   .docx
                 </Button>
@@ -317,7 +330,7 @@ function TalentaApp() {
                   {exportando === "pdf" ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <Download className="size-4" />
+                    <FileType2 className="size-4" />
                   )}
                   .pdf
                 </Button>
