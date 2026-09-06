@@ -104,12 +104,33 @@ function TalentaApp() {
     },
   });
 
+  const montarRegistro = (base: Curriculo): Curriculo => {
+    const registro: Curriculo = { ...base, entrevista: relato.trim() || base.entrevista };
+    if (ocultarContato) {
+      registro.email = "";
+      registro.telefone = "";
+    }
+    if (contatosErs) {
+      registro.email = CONTATO_ERS.email;
+      registro.telefone = CONTATO_ERS.telefone;
+    }
+    return registro;
+  };
+
+  const reiniciar = () => {
+    setArquivo(null);
+    setRelato("");
+    setDados(null);
+    setFalha(null);
+    if (inputRef.current) inputRef.current.value = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const exportar = async (formato: "docx" | "pdf") => {
     if (!dados) return;
     setExportando(formato);
     try {
-      const registro = { ...dados, entrevista: relato.trim() || dados.entrevista };
+      const registro = montarRegistro(dados);
       if (formato === "docx") {
         const { gerarDocx } = await import("@/lib/build-docx");
         baixar(await gerarDocx(registro, ERS_LOGO_URL), `${nomeBase(dados)}.docx`);
