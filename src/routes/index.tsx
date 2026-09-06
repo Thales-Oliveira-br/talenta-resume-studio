@@ -486,3 +486,97 @@ function Bloco({ titulo, children }: { titulo: string; children: React.ReactNode
     </div>
   );
 }
+
+function AnexoExtra({
+  titulo,
+  arquivo,
+  onArquivo,
+  rotuloRelato,
+  relato,
+  onRelato,
+  idRelato,
+}: {
+  titulo: string;
+  arquivo: File | null;
+  onArquivo: (f: File | null) => void;
+  rotuloRelato: string;
+  relato: string;
+  onRelato: (v: string) => void;
+  idRelato: string;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [arrastando, setArrastando] = useState(false);
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label className="text-sm font-medium">{titulo}</Label>
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setArrastando(true);
+          }}
+          onDragLeave={() => setArrastando(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setArrastando(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) onArquivo(f);
+          }}
+          onClick={() => ref.current?.click()}
+          className={`glass-soft mt-2 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-dashed px-6 py-12 text-center transition ${
+            arrastando ? "ring-2 ring-ring" : "hover:bg-accent/40"
+          }`}
+        >
+          <input
+            ref={ref}
+            type="file"
+            accept=".pdf,.docx,.doc,.txt"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) onArquivo(f);
+            }}
+          />
+          {arquivo ? (
+            <>
+              <FileText className="size-7 text-primary" />
+              <p className="text-sm font-medium">{arquivo.name}</p>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onArquivo(null);
+                  if (ref.current) ref.current.value = "";
+                }}
+              >
+                <X className="size-3" /> remover
+              </button>
+            </>
+          ) : (
+            <>
+              <Upload className="size-7 text-primary" />
+              <p className="text-sm font-medium">Arraste o arquivo aqui ou clique para selecionar</p>
+              <p className="text-xs text-muted-foreground">PDF, DOCX ou TXT</p>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor={idRelato} className="text-sm font-medium">
+          {rotuloRelato}
+        </Label>
+        <Textarea
+          id={idRelato}
+          value={relato}
+          onChange={(e) => onRelato(e.target.value)}
+          rows={5}
+          placeholder="Observações e interpretação do resultado..."
+          className="glass-input mt-2 resize-y"
+        />
+      </div>
+    </div>
+  );
+}
