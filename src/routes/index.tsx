@@ -10,7 +10,6 @@ import { PoweredByFooter } from "@/components/PoweredByFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
