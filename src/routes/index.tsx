@@ -59,6 +59,11 @@ function nomeBase(dados: Curriculo) {
   return `CURRICULO_${limpo || "PADRONIZADO"}`;
 }
 
+const CONTATO_ERS = {
+  telefone: "(54) 9 99014063",
+  email: "elizabete@elizabetescain.com.br",
+};
+
 function TalentaApp() {
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [relato, setRelato] = useState("");
