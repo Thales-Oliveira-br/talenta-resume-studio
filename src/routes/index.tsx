@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { FileText, FileType2, Loader2, Printer, RotateCcw, Sparkles, Upload, X } from "lucide-react";
+import { FileText, FileType2, Loader2, RotateCcw, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
@@ -71,10 +71,14 @@ function TalentaApp() {
   const [falha, setFalha] = useState<string | null>(null);
   const [ocultarContato, setOcultarContato] = useState(false);
   const [contatosErs, setContatosErs] = useState(false);
+  const [pdaAtivo, setPdaAtivo] = useState(false);
+  const [discAtivo, setDiscAtivo] = useState(false);
+  const [arquivoPda, setArquivoPda] = useState<File | null>(null);
+  const [arquivoDisc, setArquivoDisc] = useState<File | null>(null);
+  const [relatoPda, setRelatoPda] = useState("");
+  const [relatoDisc, setRelatoDisc] = useState("");
 
-
-
-  const [exportando, setExportando] = useState<"docx" | "pdf" | "print" | null>(null);
+  const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -126,6 +130,10 @@ function TalentaApp() {
     setRelato("");
     setDados(null);
     setFalha(null);
+    setArquivoPda(null);
+    setArquivoDisc(null);
+    setRelatoPda("");
+    setRelatoDisc("");
     if (inputRef.current) inputRef.current.value = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -149,37 +157,6 @@ function TalentaApp() {
     }
   };
 
-  const imprimir = async () => {
-    if (!dados) return;
-    setExportando("print");
-    try {
-      const registro = montarRegistro(dados);
-      const { gerarPdf } = await import("@/lib/build-pdf");
-      const blob = await gerarPdf(registro, ERS_LOGO_URL);
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "fixed";
-      iframe.style.right = "0";
-      iframe.style.bottom = "0";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "0";
-      iframe.src = url;
-      iframe.onload = () => {
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-          iframe.remove();
-        }, 60000);
-      };
-      document.body.appendChild(iframe);
-    } catch (erro) {
-      toast.error((erro as Error).message || "Não foi possível abrir a impressão.");
-    } finally {
-      setExportando(null);
-    }
-  };
 
   return (
     <div className="relative min-h-screen">
@@ -321,7 +298,61 @@ function TalentaApp() {
                 </span>
               </span>
             </label>
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={pdaAtivo}
+                onChange={(e) => setPdaAtivo(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-primary"
+              />
+              <span>
+                Padronizar PDA
+                <span className="block text-xs text-muted-foreground">
+                  Abre o envio do arquivo do PDA e o relato correspondente.
+                </span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={discAtivo}
+                onChange={(e) => setDiscAtivo(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-primary"
+              />
+              <span>
+                Padronizar DISC
+                <span className="block text-xs text-muted-foreground">
+                  Abre o envio do arquivo do DISC e o relato correspondente.
+                </span>
+              </span>
+            </label>
           </div>
+
+          {pdaAtivo && (
+            <AnexoExtra
+              titulo="Arquivo do PDA"
+              arquivo={arquivoPda}
+              onArquivo={setArquivoPda}
+              rotuloRelato="Relato do PDA"
+              relato={relatoPda}
+              onRelato={setRelatoPda}
+              idRelato="relato-pda"
+            />
+          )}
+
+          {discAtivo && (
+            <AnexoExtra
+              titulo="Arquivo do DISC"
+              arquivo={arquivoDisc}
+              onArquivo={setArquivoDisc}
+              rotuloRelato="Relato do DISC"
+              relato={relatoDisc}
+              onRelato={setRelatoDisc}
+              idRelato="relato-disc"
+            />
+          )}
+
+
 
 
           <Button
