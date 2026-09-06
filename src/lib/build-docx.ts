@@ -19,7 +19,7 @@ const CONTATO = {
   telefone: "(54) 9 99014063",
   email: "elizabete@elizabetescain.com.br",
   site: "www.elizabetescain.com.br",
-  assinatura: "Elizabete Rosa Sacain",
+  assinatura: "Elizabete Rosa Scain",
 };
 
 type Alinhamento = (typeof AlignmentType)[keyof typeof AlignmentType];

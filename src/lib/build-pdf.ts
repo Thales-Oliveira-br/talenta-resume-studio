@@ -48,7 +48,7 @@ export async function gerarPdf(dados: Curriculo, logoUrl: string): Promise<Blob>
     doc.text("Elizabete Rosa Scain", M, ALTURA - 14);
     doc.setFont("helvetica", "normal");
     doc.text(" | (54) 9 99014063", M + doc.getTextWidth("Elizabete Rosa Scain"), ALTURA - 14);
-    doc.text("Elizabete Rosa Sacain", LARGURA - M, ALTURA - 14, { align: "right" });
+    doc.text("Elizabete Rosa Scain", LARGURA - M, ALTURA - 14, { align: "right" });
     doc.setTextColor(30, 90, 160);
     doc.text("elizabete@elizabetescain.com.br | www.elizabetescain.com.br", M, ALTURA - 10);
     doc.setTextColor(0);

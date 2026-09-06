@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { FileText, FileType2, Loader2, Printer, Sparkles, Upload, X } from "lucide-react";
+import { FileText, FileType2, Loader2, Printer, RotateCcw, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
@@ -10,6 +10,7 @@ import { PoweredByFooter } from "@/components/PoweredByFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
@@ -58,12 +59,21 @@ function nomeBase(dados: Curriculo) {
   return `CURRICULO_${limpo || "PADRONIZADO"}`;
 }
 
+const CONTATO_ERS = {
+  telefone: "(54) 9 99014063",
+  email: "elizabete@elizabetescain.com.br",
+};
+
 function TalentaApp() {
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [relato, setRelato] = useState("");
   const [arrastando, setArrastando] = useState(false);
   const [dados, setDados] = useState<Curriculo | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
+  const [ocultarContato, setOcultarContato] = useState(false);
+  const [contatosErs, setContatosErs] = useState(false);
+
+
 
   const [exportando, setExportando] = useState<"docx" | "pdf" | "print" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -99,12 +109,33 @@ function TalentaApp() {
     },
   });
 
+  const montarRegistro = (base: Curriculo): Curriculo => {
+    const registro: Curriculo = { ...base, entrevista: relato.trim() || base.entrevista };
+    if (ocultarContato) {
+      registro.email = "";
+      registro.telefone = "";
+    }
+    if (contatosErs) {
+      registro.email = CONTATO_ERS.email;
+      registro.telefone = CONTATO_ERS.telefone;
+    }
+    return registro;
+  };
+
+  const reiniciar = () => {
+    setArquivo(null);
+    setRelato("");
+    setDados(null);
+    setFalha(null);
+    if (inputRef.current) inputRef.current.value = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const exportar = async (formato: "docx" | "pdf") => {
     if (!dados) return;
     setExportando(formato);
     try {
-      const registro = { ...dados, entrevista: relato.trim() || dados.entrevista };
+      const registro = montarRegistro(dados);
       if (formato === "docx") {
         const { gerarDocx } = await import("@/lib/build-docx");
         baixar(await gerarDocx(registro, ERS_LOGO_URL), `${nomeBase(dados)}.docx`);
@@ -123,7 +154,7 @@ function TalentaApp() {
     if (!dados) return;
     setExportando("print");
     try {
-      const registro = { ...dados, entrevista: relato.trim() || dados.entrevista };
+      const registro = montarRegistro(dados);
       const { gerarPdf } = await import("@/lib/build-pdf");
       const blob = await gerarPdf(registro, ERS_LOGO_URL);
       const url = URL.createObjectURL(blob);
@@ -262,6 +293,36 @@ function TalentaApp() {
             </p>
           </div>
 
+          <div className="glass-soft space-y-3 rounded-2xl p-4">
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <Checkbox
+                checked={ocultarContato}
+                onCheckedChange={(v) => setOcultarContato(v === true)}
+                className="mt-0.5"
+              />
+              <span>
+                Ocultar telefone/e-mail do candidato
+                <span className="block text-xs text-muted-foreground">
+                  A linha de contato do candidato não aparece no currículo padronizado.
+                </span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <Checkbox
+                checked={contatosErs}
+                onCheckedChange={(v) => setContatosErs(v === true)}
+                className="mt-0.5"
+              />
+              <span>
+                Inserir contatos da Elizabete
+                <span className="block text-xs text-muted-foreground">
+                  Usa {CONTATO_ERS.telefone} e {CONTATO_ERS.email} no lugar dos do candidato.
+                </span>
+              </span>
+            </label>
+          </div>
+
+
           <Button
             className="w-full rounded-xl"
             disabled={!arquivo || processar.isPending}
@@ -292,10 +353,21 @@ function TalentaApp() {
               <div>
                 <h2 className="font-display text-xl font-semibold">{dados.nome || "Candidato"}</h2>
                 <p className="text-xs text-muted-foreground">
-                  {[dados.cidade, dados.telefone, dados.email].filter(Boolean).join(" · ")}
+                  {[dados.cidade, montarRegistro(dados).telefone, montarRegistro(dados).email]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="ghost"
+                  className="rounded-xl"
+                  disabled={exportando !== null}
+                  onClick={reiniciar}
+                >
+                  <RotateCcw className="size-4" />
+                  Enviar novo currículo
+                </Button>
                 <Button
                   variant="outline"
                   className="rounded-xl"
