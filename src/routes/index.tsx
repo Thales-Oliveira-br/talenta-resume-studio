@@ -293,6 +293,36 @@ function TalentaApp() {
             </p>
           </div>
 
+          <div className="glass-soft space-y-3 rounded-2xl p-4">
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <Checkbox
+                checked={ocultarContato}
+                onCheckedChange={(v) => setOcultarContato(v === true)}
+                className="mt-0.5"
+              />
+              <span>
+                Ocultar telefone/e-mail do candidato
+                <span className="block text-xs text-muted-foreground">
+                  A linha de contato do candidato não aparece no currículo padronizado.
+                </span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <Checkbox
+                checked={contatosErs}
+                onCheckedChange={(v) => setContatosErs(v === true)}
+                className="mt-0.5"
+              />
+              <span>
+                Inserir contatos da Elizabete
+                <span className="block text-xs text-muted-foreground">
+                  Usa {CONTATO_ERS.telefone} e {CONTATO_ERS.email} no lugar dos do candidato.
+                </span>
+              </span>
+            </label>
+          </div>
+
+
           <Button
             className="w-full rounded-xl"
             disabled={!arquivo || processar.isPending}
