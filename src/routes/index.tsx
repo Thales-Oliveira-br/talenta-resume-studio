@@ -10,7 +10,6 @@ import { PoweredByFooter } from "@/components/PoweredByFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
@@ -295,10 +294,11 @@ function TalentaApp() {
 
           <div className="glass-soft space-y-3 rounded-2xl p-4">
             <label className="flex cursor-pointer items-start gap-3 text-sm">
-              <Checkbox
+              <input
+                type="checkbox"
                 checked={ocultarContato}
-                onCheckedChange={(v) => setOcultarContato(v === true)}
-                className="mt-0.5"
+                onChange={(e) => setOcultarContato(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-primary"
               />
               <span>
                 Ocultar telefone/e-mail do candidato
@@ -308,10 +308,11 @@ function TalentaApp() {
               </span>
             </label>
             <label className="flex cursor-pointer items-start gap-3 text-sm">
-              <Checkbox
+              <input
+                type="checkbox"
                 checked={contatosErs}
-                onCheckedChange={(v) => setContatosErs(v === true)}
-                className="mt-0.5"
+                onChange={(e) => setContatosErs(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-primary"
               />
               <span>
                 Inserir contatos da Elizabete
