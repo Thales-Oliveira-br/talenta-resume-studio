@@ -353,10 +353,21 @@ function TalentaApp() {
               <div>
                 <h2 className="font-display text-xl font-semibold">{dados.nome || "Candidato"}</h2>
                 <p className="text-xs text-muted-foreground">
-                  {[dados.cidade, dados.telefone, dados.email].filter(Boolean).join(" · ")}
+                  {[dados.cidade, montarRegistro(dados).telefone, montarRegistro(dados).email]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="ghost"
+                  className="rounded-xl"
+                  disabled={exportando !== null}
+                  onClick={reiniciar}
+                >
+                  <RotateCcw className="size-4" />
+                  Enviar novo currículo
+                </Button>
                 <Button
                   variant="outline"
                   className="rounded-xl"
