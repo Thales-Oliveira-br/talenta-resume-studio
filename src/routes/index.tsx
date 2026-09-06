@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { FileText, FileType2, Loader2, Printer, RotateCcw, Sparkles, Upload, X } from "lucide-react";
+import { FileText, FileType2, Loader2, RotateCcw, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
@@ -71,10 +71,14 @@ function TalentaApp() {
   const [falha, setFalha] = useState<string | null>(null);
   const [ocultarContato, setOcultarContato] = useState(false);
   const [contatosErs, setContatosErs] = useState(false);
+  const [pdaAtivo, setPdaAtivo] = useState(false);
+  const [discAtivo, setDiscAtivo] = useState(false);
+  const [arquivoPda, setArquivoPda] = useState<File | null>(null);
+  const [arquivoDisc, setArquivoDisc] = useState<File | null>(null);
+  const [relatoPda, setRelatoPda] = useState("");
+  const [relatoDisc, setRelatoDisc] = useState("");
 
-
-
-  const [exportando, setExportando] = useState<"docx" | "pdf" | "print" | null>(null);
+  const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -126,6 +130,10 @@ function TalentaApp() {
     setRelato("");
     setDados(null);
     setFalha(null);
+    setArquivoPda(null);
+    setArquivoDisc(null);
+    setRelatoPda("");
+    setRelatoDisc("");
     if (inputRef.current) inputRef.current.value = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -149,37 +157,6 @@ function TalentaApp() {
     }
   };
 
-  const imprimir = async () => {
-    if (!dados) return;
-    setExportando("print");
-    try {
-      const registro = montarRegistro(dados);
-      const { gerarPdf } = await import("@/lib/build-pdf");
-      const blob = await gerarPdf(registro, ERS_LOGO_URL);
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "fixed";
-      iframe.style.right = "0";
-      iframe.style.bottom = "0";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "0";
-      iframe.src = url;
-      iframe.onload = () => {
-        iframe.contentWindow?.focus();
-        iframe.contentWindow?.print();
-        setTimeout(() => {
-          URL.revokeObjectURL(url);
-          iframe.remove();
-        }, 60000);
-      };
-      document.body.appendChild(iframe);
-    } catch (erro) {
-      toast.error((erro as Error).message || "Não foi possível abrir a impressão.");
-    } finally {
-      setExportando(null);
-    }
-  };
 
   return (
     <div className="relative min-h-screen">
@@ -321,7 +298,61 @@ function TalentaApp() {
                 </span>
               </span>
             </label>
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={pdaAtivo}
+                onChange={(e) => setPdaAtivo(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-primary"
+              />
+              <span>
+                Padronizar PDA
+                <span className="block text-xs text-muted-foreground">
+                  Abre o envio do arquivo do PDA e o relato correspondente.
+                </span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={discAtivo}
+                onChange={(e) => setDiscAtivo(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-primary"
+              />
+              <span>
+                Padronizar DISC
+                <span className="block text-xs text-muted-foreground">
+                  Abre o envio do arquivo do DISC e o relato correspondente.
+                </span>
+              </span>
+            </label>
           </div>
+
+          {pdaAtivo && (
+            <AnexoExtra
+              titulo="Arquivo do PDA"
+              arquivo={arquivoPda}
+              onArquivo={setArquivoPda}
+              rotuloRelato="Relato do PDA"
+              relato={relatoPda}
+              onRelato={setRelatoPda}
+              idRelato="relato-pda"
+            />
+          )}
+
+          {discAtivo && (
+            <AnexoExtra
+              titulo="Arquivo do DISC"
+              arquivo={arquivoDisc}
+              onArquivo={setArquivoDisc}
+              rotuloRelato="Relato do DISC"
+              relato={relatoDisc}
+              onRelato={setRelatoDisc}
+              idRelato="relato-disc"
+            />
+          )}
+
+
 
 
           <Button
@@ -368,19 +399,6 @@ function TalentaApp() {
                 >
                   <RotateCcw className="size-4" />
                   Enviar novo currículo
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-xl"
-                  disabled={exportando !== null}
-                  onClick={imprimir}
-                >
-                  {exportando === "print" ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Printer className="size-4" />
-                  )}
-                  Imprimir
                 </Button>
                 <Button
                   variant="secondary"
@@ -465,6 +483,100 @@ function Bloco({ titulo, children }: { titulo: string; children: React.ReactNode
     <div className="glass-soft rounded-2xl p-4">
       <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-primary">{titulo}</p>
       {children}
+    </div>
+  );
+}
+
+function AnexoExtra({
+  titulo,
+  arquivo,
+  onArquivo,
+  rotuloRelato,
+  relato,
+  onRelato,
+  idRelato,
+}: {
+  titulo: string;
+  arquivo: File | null;
+  onArquivo: (f: File | null) => void;
+  rotuloRelato: string;
+  relato: string;
+  onRelato: (v: string) => void;
+  idRelato: string;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [arrastando, setArrastando] = useState(false);
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label className="text-sm font-medium">{titulo}</Label>
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setArrastando(true);
+          }}
+          onDragLeave={() => setArrastando(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setArrastando(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) onArquivo(f);
+          }}
+          onClick={() => ref.current?.click()}
+          className={`glass-soft mt-2 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-dashed px-6 py-12 text-center transition ${
+            arrastando ? "ring-2 ring-ring" : "hover:bg-accent/40"
+          }`}
+        >
+          <input
+            ref={ref}
+            type="file"
+            accept=".pdf,.docx,.doc,.txt"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) onArquivo(f);
+            }}
+          />
+          {arquivo ? (
+            <>
+              <FileText className="size-7 text-primary" />
+              <p className="text-sm font-medium">{arquivo.name}</p>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onArquivo(null);
+                  if (ref.current) ref.current.value = "";
+                }}
+              >
+                <X className="size-3" /> remover
+              </button>
+            </>
+          ) : (
+            <>
+              <Upload className="size-7 text-primary" />
+              <p className="text-sm font-medium">Arraste o arquivo aqui ou clique para selecionar</p>
+              <p className="text-xs text-muted-foreground">PDF, DOCX ou TXT</p>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor={idRelato} className="text-sm font-medium">
+          {rotuloRelato}
+        </Label>
+        <Textarea
+          id={idRelato}
+          value={relato}
+          onChange={(e) => onRelato(e.target.value)}
+          rows={5}
+          placeholder="Observações e interpretação do resultado..."
+          className="glass-input mt-2 resize-y"
+        />
+      </div>
     </div>
   );
 }
