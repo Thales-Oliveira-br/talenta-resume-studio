@@ -154,7 +154,7 @@ function TalentaApp() {
     if (!dados) return;
     setExportando("print");
     try {
-      const registro = { ...dados, entrevista: relato.trim() || dados.entrevista };
+      const registro = montarRegistro(dados);
       const { gerarPdf } = await import("@/lib/build-pdf");
       const blob = await gerarPdf(registro, ERS_LOGO_URL);
       const url = URL.createObjectURL(blob);
