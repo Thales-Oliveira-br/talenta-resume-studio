@@ -401,19 +401,6 @@ function TalentaApp() {
                   Enviar novo currículo
                 </Button>
                 <Button
-                  variant="outline"
-                  className="rounded-xl"
-                  disabled={exportando !== null}
-                  onClick={imprimir}
-                >
-                  {exportando === "print" ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <Printer className="size-4" />
-                  )}
-                  Imprimir
-                </Button>
-                <Button
                   variant="secondary"
                   className="rounded-xl"
                   disabled={exportando !== null}
