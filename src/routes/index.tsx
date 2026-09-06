@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { FileText, FileType2, Loader2, Printer, Sparkles, Upload, X } from "lucide-react";
+import { FileText, FileType2, Loader2, Printer, RotateCcw, Sparkles, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
@@ -10,6 +10,7 @@ import { PoweredByFooter } from "@/components/PoweredByFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
