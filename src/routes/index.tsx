@@ -65,6 +65,10 @@ function TalentaApp() {
   const [arrastando, setArrastando] = useState(false);
   const [dados, setDados] = useState<Curriculo | null>(null);
   const [falha, setFalha] = useState<string | null>(null);
+  const [ocultarContato, setOcultarContato] = useState(false);
+  const [contatosErs, setContatosErs] = useState(false);
+
+
 
   const [exportando, setExportando] = useState<"docx" | "pdf" | "print" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
