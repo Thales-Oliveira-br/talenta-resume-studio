@@ -30,7 +30,15 @@ async function carregarLogo(url: string): Promise<{ dataUrl: string; ratio: numb
   }
 }
 
-export async function gerarPdf(dados: Curriculo, logoUrl: string): Promise<Blob> {
+export type AnexoExportacao = { titulo: string; texto: string; relato: string };
+
+export async function gerarPdf(
+  dados: Curriculo,
+  logoUrl: string,
+  opts: { incluirCurriculo?: boolean; anexos?: AnexoExportacao[] } = {},
+): Promise<Blob> {
+  const incluirCurriculo = opts.incluirCurriculo !== false;
+  const anexos = opts.anexos ?? [];
   const logo = await carregarLogo(logoUrl);
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const largura = LARGURA - M * 2;
