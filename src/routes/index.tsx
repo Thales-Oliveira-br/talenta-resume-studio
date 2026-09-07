@@ -157,18 +157,46 @@ function TalentaApp() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const montarAnexos = async () => {
+    const lista: { titulo: string; texto: string; relato: string }[] = [];
+    if (incPda) {
+      if (!arquivoPda) throw new Error("Anexe o arquivo do PDA na aba PDA.");
+      lista.push({ titulo: "PDA", texto: await extractTextFromFile(arquivoPda), relato: relatoPda });
+    }
+    if (incDisc) {
+      if (!arquivoDisc) throw new Error("Anexe o arquivo do DISC na aba DISC.");
+      lista.push({
+        titulo: "DISC",
+        texto: await extractTextFromFile(arquivoDisc),
+        relato: relatoDisc,
+      });
+    }
+    return lista;
+  };
+
+  const sufixoArquivo = () =>
+    [incCurriculo && "CURRICULO", incPda && "PDA", incDisc && "DISC"].filter(Boolean).join("_");
+
   const exportar = async (formato: "docx" | "pdf") => {
     if (!dados) return;
+    if (!incCurriculo && !incPda && !incDisc) {
+      toast.error("Selecione ao menos um documento para exportar.");
+      return;
+    }
     setExportando(formato);
     try {
       const registro = montarRegistro(dados);
+      const anexos = await montarAnexos();
+      const opts = { incluirCurriculo: incCurriculo, anexos };
+      const nome = `${nomeBase(dados).replace(/^CURRICULO/, sufixoArquivo())}`;
       if (formato === "docx") {
         const { gerarDocx } = await import("@/lib/build-docx");
-        baixar(await gerarDocx(registro, ERS_LOGO_URL), `${nomeBase(dados)}.docx`);
+        baixar(await gerarDocx(registro, ERS_LOGO_URL, opts), `${nome}.docx`);
       } else {
         const { gerarPdf } = await import("@/lib/build-pdf");
-        baixar(await gerarPdf(registro, ERS_LOGO_URL), `${nomeBase(dados)}.pdf`);
+        baixar(await gerarPdf(registro, ERS_LOGO_URL, opts), `${nome}.pdf`);
       }
+      setOpcoesAberto(false);
     } catch (erro) {
       toast.error((erro as Error).message || "Não foi possível gerar o arquivo.");
     } finally {
