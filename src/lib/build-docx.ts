@@ -53,7 +53,15 @@ function corpo(
   });
 }
 
-export async function gerarDocx(dados: Curriculo, logoUrl: string): Promise<Blob> {
+export type AnexoExportacao = { titulo: string; texto: string; relato: string };
+
+export async function gerarDocx(
+  dados: Curriculo,
+  logoUrl: string,
+  opts: { incluirCurriculo?: boolean; anexos?: AnexoExportacao[] } = {},
+): Promise<Blob> {
+  const incluirCurriculo = opts.incluirCurriculo !== false;
+  const anexos = opts.anexos ?? [];
   let logo: Uint8Array | null = null;
   try {
     const resposta = await fetch(logoUrl);
