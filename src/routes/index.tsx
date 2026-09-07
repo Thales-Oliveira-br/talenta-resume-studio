@@ -72,8 +72,6 @@ function TalentaApp() {
   const [falha, setFalha] = useState<string | null>(null);
   const [ocultarContato, setOcultarContato] = useState(false);
   const [contatosErs, setContatosErs] = useState(false);
-  const [pdaAtivo, setPdaAtivo] = useState(false);
-  const [discAtivo, setDiscAtivo] = useState(false);
   const [arquivoPda, setArquivoPda] = useState<File | null>(null);
   const [arquivoDisc, setArquivoDisc] = useState<File | null>(null);
   const [relatoPda, setRelatoPda] = useState("");
