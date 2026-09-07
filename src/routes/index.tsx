@@ -438,6 +438,15 @@ function TalentaApp() {
                   Enviar novo currículo
                 </Button>
                 <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  disabled={exportando !== null}
+                  onClick={() => setOpcoesAberto(true)}
+                >
+                  <Settings2 className="size-4" />
+                  Opções de exportação
+                </Button>
+                <Button
                   variant="secondary"
                   className="rounded-xl"
                   disabled={exportando !== null}
