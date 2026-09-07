@@ -11,6 +11,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
 import { estaLogado, sair } from "@/lib/session";
@@ -196,187 +197,177 @@ function TalentaApp() {
           qualquer modelo em PDF ou DOCX — a saída sai sempre no layout oficial.
         </p>
 
-        <section className="glass mt-8 space-y-6 rounded-3xl p-6 sm:p-8">
-          <div>
-            <Label className="text-sm font-medium">Currículo do candidato</Label>
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setArrastando(true);
-              }}
-              onDragLeave={() => setArrastando(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setArrastando(false);
-                const f = e.dataTransfer.files?.[0];
-                if (f) setArquivo(f);
-              }}
-              onClick={() => inputRef.current?.click()}
-              className={`glass-soft mt-2 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-dashed px-6 py-12 text-center transition ${
-                arrastando ? "ring-2 ring-ring" : "hover:bg-accent/40"
-              }`}
-            >
-              <input
-                ref={inputRef}
-                type="file"
-                accept=".pdf,.docx,.doc,.txt"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) setArquivo(f);
-                }}
-              />
-              {arquivo ? (
-                <>
-                  <FileText className="size-7 text-primary" />
-                  <p className="text-sm font-medium">{arquivo.name}</p>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setArquivo(null);
-                      setDados(null);
+        <section className="glass mt-8 rounded-3xl p-6 sm:p-8">
+          <Tabs defaultValue="curriculo" className="w-full">
+            <TabsList className="glass-soft grid w-full grid-cols-3 rounded-2xl p-1">
+              <TabsTrigger value="curriculo" className="rounded-xl">
+                Currículo
+              </TabsTrigger>
+              <TabsTrigger value="pda" className="rounded-xl">
+                PDA
+              </TabsTrigger>
+              <TabsTrigger value="disc" className="rounded-xl">
+                DISC
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="curriculo" className="mt-6 space-y-6">
+              <div>
+                <Label className="text-sm font-medium">Currículo do candidato</Label>
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setArrastando(true);
+                  }}
+                  onDragLeave={() => setArrastando(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setArrastando(false);
+                    const f = e.dataTransfer.files?.[0];
+                    if (f) setArquivo(f);
+                  }}
+                  onClick={() => inputRef.current?.click()}
+                  className={`glass-soft mt-2 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-dashed px-6 py-12 text-center transition ${
+                    arrastando ? "ring-2 ring-ring" : "hover:bg-accent/40"
+                  }`}
+                >
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    accept=".pdf,.docx,.doc,.txt"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) setArquivo(f);
                     }}
-                  >
-                    <X className="size-3" /> remover
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Upload className="size-7 text-primary" />
-                  <p className="text-sm font-medium">Arraste o arquivo aqui ou clique para selecionar</p>
-                  <p className="text-xs text-muted-foreground">PDF, DOCX ou TXT — qualquer modelo</p>
-                </>
+                  />
+                  {arquivo ? (
+                    <>
+                      <FileText className="size-7 text-primary" />
+                      <p className="text-sm font-medium">{arquivo.name}</p>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setArquivo(null);
+                          setDados(null);
+                        }}
+                      >
+                        <X className="size-3" /> remover
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="size-7 text-primary" />
+                      <p className="text-sm font-medium">
+                        Arraste o arquivo aqui ou clique para selecionar
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        PDF, DOCX ou TXT — qualquer modelo
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="relato" className="text-sm font-medium">
+                  Relato da entrevista com o candidato
+                </Label>
+                <Textarea
+                  id="relato"
+                  value={relato}
+                  onChange={(e) => setRelato(e.target.value)}
+                  rows={6}
+                  placeholder="Impressões da recrutadora sobre a entrevista: perfil, comunicação, pretensão, disponibilidade, pontos de atenção..."
+                  className="glass-input mt-2 resize-y"
+                />
+                <p className="mt-2 text-xs text-muted-foreground">
+                  O texto entra no bloco “ENTREVISTA REALIZADA” do currículo padronizado.
+                </p>
+              </div>
+
+              <div className="glass-soft space-y-3 rounded-2xl p-4">
+                <label className="flex cursor-pointer items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={ocultarContato}
+                    onChange={(e) => setOcultarContato(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-primary"
+                  />
+                  <span>
+                    Ocultar telefone/e-mail do candidato
+                    <span className="block text-xs text-muted-foreground">
+                      A linha de contato do candidato não aparece no currículo padronizado.
+                    </span>
+                  </span>
+                </label>
+                <label className="flex cursor-pointer items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={contatosErs}
+                    onChange={(e) => setContatosErs(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-primary"
+                  />
+                  <span>
+                    Inserir contatos da Elizabete
+                    <span className="block text-xs text-muted-foreground">
+                      Usa {CONTATO_ERS.telefone} e {CONTATO_ERS.email} no lugar dos do candidato.
+                    </span>
+                  </span>
+                </label>
+              </div>
+
+              <Button
+                className="w-full rounded-xl"
+                disabled={!arquivo || processar.isPending}
+                onClick={() => processar.mutate()}
+              >
+                {processar.isPending ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" /> Lendo e padronizando...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="size-4" /> Padronizar currículo
+                  </>
+                )}
+              </Button>
+
+              {falha && (
+                <p className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  {falha}
+                </p>
               )}
-            </div>
-          </div>
+            </TabsContent>
 
-          <div>
-            <Label htmlFor="relato" className="text-sm font-medium">
-              Relato da entrevista com o candidato
-            </Label>
-            <Textarea
-              id="relato"
-              value={relato}
-              onChange={(e) => setRelato(e.target.value)}
-              rows={6}
-              placeholder="Impressões da recrutadora sobre a entrevista: perfil, comunicação, pretensão, disponibilidade, pontos de atenção..."
-              className="glass-input mt-2 resize-y"
-            />
-            <p className="mt-2 text-xs text-muted-foreground">
-              O texto entra no bloco “ENTREVISTA REALIZADA” do currículo padronizado.
-            </p>
-          </div>
-
-          <div className="glass-soft space-y-3 rounded-2xl p-4">
-            <label className="flex cursor-pointer items-start gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={ocultarContato}
-                onChange={(e) => setOcultarContato(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-primary"
+            <TabsContent value="pda" className="mt-6">
+              <AnexoExtra
+                titulo="Arquivo do PDA"
+                arquivo={arquivoPda}
+                onArquivo={setArquivoPda}
+                rotuloRelato="Relato do PDA"
+                relato={relatoPda}
+                onRelato={setRelatoPda}
+                idRelato="relato-pda"
               />
-              <span>
-                Ocultar telefone/e-mail do candidato
-                <span className="block text-xs text-muted-foreground">
-                  A linha de contato do candidato não aparece no currículo padronizado.
-                </span>
-              </span>
-            </label>
-            <label className="flex cursor-pointer items-start gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={contatosErs}
-                onChange={(e) => setContatosErs(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-primary"
+            </TabsContent>
+
+            <TabsContent value="disc" className="mt-6">
+              <AnexoExtra
+                titulo="Arquivo do DISC"
+                arquivo={arquivoDisc}
+                onArquivo={setArquivoDisc}
+                rotuloRelato="Relato do DISC"
+                relato={relatoDisc}
+                onRelato={setRelatoDisc}
+                idRelato="relato-disc"
               />
-              <span>
-                Inserir contatos da Elizabete
-                <span className="block text-xs text-muted-foreground">
-                  Usa {CONTATO_ERS.telefone} e {CONTATO_ERS.email} no lugar dos do candidato.
-                </span>
-              </span>
-            </label>
-            <label className="flex cursor-pointer items-start gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={pdaAtivo}
-                onChange={(e) => setPdaAtivo(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-primary"
-              />
-              <span>
-                Padronizar PDA
-                <span className="block text-xs text-muted-foreground">
-                  Abre o envio do arquivo do PDA e o relato correspondente.
-                </span>
-              </span>
-            </label>
-            <label className="flex cursor-pointer items-start gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={discAtivo}
-                onChange={(e) => setDiscAtivo(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-primary"
-              />
-              <span>
-                Padronizar DISC
-                <span className="block text-xs text-muted-foreground">
-                  Abre o envio do arquivo do DISC e o relato correspondente.
-                </span>
-              </span>
-            </label>
-          </div>
-
-          {pdaAtivo && (
-            <AnexoExtra
-              titulo="Arquivo do PDA"
-              arquivo={arquivoPda}
-              onArquivo={setArquivoPda}
-              rotuloRelato="Relato do PDA"
-              relato={relatoPda}
-              onRelato={setRelatoPda}
-              idRelato="relato-pda"
-            />
-          )}
-
-          {discAtivo && (
-            <AnexoExtra
-              titulo="Arquivo do DISC"
-              arquivo={arquivoDisc}
-              onArquivo={setArquivoDisc}
-              rotuloRelato="Relato do DISC"
-              relato={relatoDisc}
-              onRelato={setRelatoDisc}
-              idRelato="relato-disc"
-            />
-          )}
-
-
-
-
-          <Button
-            className="w-full rounded-xl"
-            disabled={!arquivo || processar.isPending}
-            onClick={() => processar.mutate()}
-          >
-            {processar.isPending ? (
-              <>
-                <Loader2 className="size-4 animate-spin" /> Lendo e padronizando...
-              </>
-            ) : (
-              <>
-                <Sparkles className="size-4" /> Padronizar currículo
-              </>
-            )}
-          </Button>
-
-          {falha && (
-            <p className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {falha}
-            </p>
-          )}
+            </TabsContent>
+          </Tabs>
         </section>
+
 
 
         {dados && (
