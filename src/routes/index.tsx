@@ -2,7 +2,16 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { FileText, FileType2, Loader2, RotateCcw, Sparkles, Upload, X } from "lucide-react";
+import {
+  FileText,
+  FileType2,
+  Loader2,
+  RotateCcw,
+  Settings2,
+  Sparkles,
+  Upload,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
@@ -10,6 +19,13 @@ import { PoweredByFooter } from "@/components/PoweredByFooter";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -78,6 +94,10 @@ function TalentaApp() {
   const [relatoDisc, setRelatoDisc] = useState("");
 
   const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
+  const [opcoesAberto, setOpcoesAberto] = useState(false);
+  const [incCurriculo, setIncCurriculo] = useState(true);
+  const [incPda, setIncPda] = useState(false);
+  const [incDisc, setIncDisc] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -137,18 +157,46 @@ function TalentaApp() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const montarAnexos = async () => {
+    const lista: { titulo: string; texto: string; relato: string }[] = [];
+    if (incPda) {
+      if (!arquivoPda) throw new Error("Anexe o arquivo do PDA na aba PDA.");
+      lista.push({ titulo: "PDA", texto: await extractTextFromFile(arquivoPda), relato: relatoPda });
+    }
+    if (incDisc) {
+      if (!arquivoDisc) throw new Error("Anexe o arquivo do DISC na aba DISC.");
+      lista.push({
+        titulo: "DISC",
+        texto: await extractTextFromFile(arquivoDisc),
+        relato: relatoDisc,
+      });
+    }
+    return lista;
+  };
+
+  const sufixoArquivo = () =>
+    [incCurriculo && "CURRICULO", incPda && "PDA", incDisc && "DISC"].filter(Boolean).join("_");
+
   const exportar = async (formato: "docx" | "pdf") => {
     if (!dados) return;
+    if (!incCurriculo && !incPda && !incDisc) {
+      toast.error("Selecione ao menos um documento para exportar.");
+      return;
+    }
     setExportando(formato);
     try {
       const registro = montarRegistro(dados);
+      const anexos = await montarAnexos();
+      const opts = { incluirCurriculo: incCurriculo, anexos };
+      const nome = `${nomeBase(dados).replace(/^CURRICULO/, sufixoArquivo())}`;
       if (formato === "docx") {
         const { gerarDocx } = await import("@/lib/build-docx");
-        baixar(await gerarDocx(registro, ERS_LOGO_URL), `${nomeBase(dados)}.docx`);
+        baixar(await gerarDocx(registro, ERS_LOGO_URL, opts), `${nome}.docx`);
       } else {
         const { gerarPdf } = await import("@/lib/build-pdf");
-        baixar(await gerarPdf(registro, ERS_LOGO_URL), `${nomeBase(dados)}.pdf`);
+        baixar(await gerarPdf(registro, ERS_LOGO_URL, opts), `${nome}.pdf`);
       }
+      setOpcoesAberto(false);
     } catch (erro) {
       toast.error((erro as Error).message || "Não foi possível gerar o arquivo.");
     } finally {
@@ -390,6 +438,15 @@ function TalentaApp() {
                   Enviar novo currículo
                 </Button>
                 <Button
+                  variant="outline"
+                  className="rounded-xl"
+                  disabled={exportando !== null}
+                  onClick={() => setOpcoesAberto(true)}
+                >
+                  <Settings2 className="size-4" />
+                  Opções de exportação
+                </Button>
+                <Button
                   variant="secondary"
                   className="rounded-xl"
                   disabled={exportando !== null}
@@ -461,6 +518,81 @@ function TalentaApp() {
           </section>
         )}
       </main>
+
+      <Dialog open={opcoesAberto} onOpenChange={setOpcoesAberto}>
+        <DialogContent className="glass rounded-3xl sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Opções de exportação</DialogTitle>
+            <DialogDescription>
+              Escolha o que entra no documento unificado e o formato do download.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="glass-soft space-y-3 rounded-2xl p-4">
+            {[
+              {
+                rotulo: "Currículo",
+                marcado: incCurriculo,
+                alterar: setIncCurriculo,
+                ajuda: "Currículo padronizado e relato da entrevista.",
+              },
+              {
+                rotulo: "PDA",
+                marcado: incPda,
+                alterar: setIncPda,
+                ajuda: arquivoPda ? arquivoPda.name : "Nenhum arquivo anexado na aba PDA.",
+              },
+              {
+                rotulo: "DISC",
+                marcado: incDisc,
+                alterar: setIncDisc,
+                ajuda: arquivoDisc ? arquivoDisc.name : "Nenhum arquivo anexado na aba DISC.",
+              },
+            ].map((opcao) => (
+              <label key={opcao.rotulo} className="flex cursor-pointer items-start gap-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={opcao.marcado}
+                  onChange={(e) => opcao.alterar(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-primary"
+                />
+                <span>
+                  {opcao.rotulo}
+                  <span className="block text-xs text-muted-foreground">{opcao.ajuda}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              className="flex-1 rounded-xl"
+              disabled={exportando !== null}
+              onClick={() => exportar("docx")}
+            >
+              {exportando === "docx" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <FileText className="size-4" />
+              )}
+              Baixar .docx
+            </Button>
+            <Button
+              className="flex-1 rounded-xl"
+              disabled={exportando !== null}
+              onClick={() => exportar("pdf")}
+            >
+              {exportando === "pdf" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <FileType2 className="size-4" />
+              )}
+              Baixar .pdf
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <PoweredByFooter />
     </div>
