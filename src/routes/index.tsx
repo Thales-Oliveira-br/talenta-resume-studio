@@ -2,7 +2,16 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { FileText, FileType2, Loader2, RotateCcw, Sparkles, Upload, X } from "lucide-react";
+import {
+  FileText,
+  FileType2,
+  Loader2,
+  RotateCcw,
+  Settings2,
+  Sparkles,
+  Upload,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { ErsLogo, ERS_LOGO_URL } from "@/components/ErsLogo";
