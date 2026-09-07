@@ -132,58 +132,87 @@ export async function gerarDocx(
   conteudo.push(corpo(`Transporte Próprio: (${sim}) SIM   (${nao}) NÃO`, { bold: true }));
   if (dados.cidade) conteudo.push(corpo(dados.cidade));
 
-  if (dados.objetivo) {
-    conteudo.push(secao("Objetivo"));
-    conteudo.push(corpo(dados.objetivo, { align: AlignmentType.CENTER }));
-  }
+  if (incluirCurriculo) {
+    if (dados.objetivo) {
+      conteudo.push(secao("Objetivo"));
+      conteudo.push(corpo(dados.objetivo, { align: AlignmentType.CENTER }));
+    }
 
-  if (dados.formacao.length) {
-    conteudo.push(secao("Formação Acadêmica"));
-    for (const item of dados.formacao) conteudo.push(corpo(item));
-  }
+    if (dados.formacao.length) {
+      conteudo.push(secao("Formação Acadêmica"));
+      for (const item of dados.formacao) conteudo.push(corpo(item));
+    }
 
-  if (dados.experiencias.length) {
-    conteudo.push(secao("Experiência Profissional"));
-    for (const exp of dados.experiencias) {
+    if (dados.experiencias.length) {
+      conteudo.push(secao("Experiência Profissional"));
+      for (const exp of dados.experiencias) {
+        conteudo.push(
+          new Paragraph({
+            spacing: { before: 200, line: 264 },
+            tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
+            children: [
+              texto(exp.empresa.toUpperCase(), { bold: true }),
+              texto(`\t${exp.periodo}`, { bold: true }),
+            ],
+          }),
+        );
+        if (exp.descricaoEmpresa) {
+          conteudo.push(
+            corpo(`(${exp.descricaoEmpresa.replace(/^\(|\)$/g, "")})`, { italics: true }),
+          );
+        }
+        if (exp.cargo) conteudo.push(corpo(exp.cargo.toUpperCase(), { bold: true }));
+        if (exp.atividades) conteudo.push(corpo(exp.atividades, { align: AlignmentType.JUSTIFIED }));
+      }
+    }
+
+    if (dados.competencias) {
       conteudo.push(
         new Paragraph({
-          spacing: { before: 200, line: 264 },
-          tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-          children: [
-            texto(exp.empresa.toUpperCase(), { bold: true }),
-            texto(`\t${exp.periodo}`, { bold: true }),
-          ],
+          spacing: { before: 240, after: 120 },
+          children: [texto("Competências Técnicas", { bold: true, underline: true })],
         }),
       );
-      if (exp.descricaoEmpresa) {
-        conteudo.push(corpo(`(${exp.descricaoEmpresa.replace(/^\(|\)$/g, "")})`, { italics: true }));
-      }
-      if (exp.cargo) conteudo.push(corpo(exp.cargo.toUpperCase(), { bold: true }));
-      if (exp.atividades) conteudo.push(corpo(exp.atividades, { align: AlignmentType.JUSTIFIED }));
+      conteudo.push(corpo(dados.competencias, { align: AlignmentType.JUSTIFIED }));
     }
-  }
 
-  if (dados.competencias) {
     conteudo.push(
       new Paragraph({
-        spacing: { before: 240, after: 120 },
-        children: [texto("Competências Técnicas", { bold: true, underline: true })],
+        spacing: { before: 280, after: 120 },
+        children: [texto("ENTREVISTA REALIZADA", { bold: true })],
       }),
     );
-    conteudo.push(corpo(dados.competencias, { align: AlignmentType.JUSTIFIED }));
-  }
-
-  conteudo.push(
-    new Paragraph({
-      spacing: { before: 280, after: 120 },
-      children: [texto("ENTREVISTA REALIZADA", { bold: true })],
-    }),
-  );
-  if (dados.entrevista) {
-    for (const paragrafo of dados.entrevista.split(/\n+/).filter(Boolean)) {
-      conteudo.push(corpo(paragrafo, { align: AlignmentType.JUSTIFIED }));
+    if (dados.entrevista) {
+      for (const paragrafo of dados.entrevista.split(/\n+/).filter(Boolean)) {
+        conteudo.push(corpo(paragrafo, { align: AlignmentType.JUSTIFIED }));
+      }
     }
   }
+
+  for (const [indice, anexo] of anexos.entries()) {
+    conteudo.push(
+      new Paragraph({
+        pageBreakBefore: incluirCurriculo || indice > 0,
+        spacing: { before: 240, after: 120 },
+        children: [texto(anexo.titulo.toUpperCase(), { bold: true, underline: true })],
+      }),
+    );
+    for (const paragrafo of anexo.texto.split(/\n+/).filter(Boolean)) {
+      conteudo.push(corpo(paragrafo, { align: AlignmentType.JUSTIFIED }));
+    }
+    if (anexo.relato.trim()) {
+      conteudo.push(
+        new Paragraph({
+          spacing: { before: 240, after: 120 },
+          children: [texto(`ANÁLISE ${anexo.titulo.toUpperCase()}`, { bold: true })],
+        }),
+      );
+      for (const paragrafo of anexo.relato.split(/\n+/).filter(Boolean)) {
+        conteudo.push(corpo(paragrafo, { align: AlignmentType.JUSTIFIED }));
+      }
+    }
+  }
+
 
   const doc = new Document({
     styles: { default: { document: { run: { font: FONTE, size: 22 } } } },
