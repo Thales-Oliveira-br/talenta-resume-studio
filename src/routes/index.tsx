@@ -94,6 +94,10 @@ function TalentaApp() {
   const [relatoDisc, setRelatoDisc] = useState("");
 
   const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
+  const [opcoesAberto, setOpcoesAberto] = useState(false);
+  const [incCurriculo, setIncCurriculo] = useState(true);
+  const [incPda, setIncPda] = useState(false);
+  const [incDisc, setIncDisc] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
