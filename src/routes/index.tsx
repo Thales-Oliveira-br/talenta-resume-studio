@@ -519,6 +519,81 @@ function TalentaApp() {
         )}
       </main>
 
+      <Dialog open={opcoesAberto} onOpenChange={setOpcoesAberto}>
+        <DialogContent className="glass rounded-3xl sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Opções de exportação</DialogTitle>
+            <DialogDescription>
+              Escolha o que entra no documento unificado e o formato do download.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="glass-soft space-y-3 rounded-2xl p-4">
+            {[
+              {
+                rotulo: "Currículo",
+                marcado: incCurriculo,
+                alterar: setIncCurriculo,
+                ajuda: "Currículo padronizado e relato da entrevista.",
+              },
+              {
+                rotulo: "PDA",
+                marcado: incPda,
+                alterar: setIncPda,
+                ajuda: arquivoPda ? arquivoPda.name : "Nenhum arquivo anexado na aba PDA.",
+              },
+              {
+                rotulo: "DISC",
+                marcado: incDisc,
+                alterar: setIncDisc,
+                ajuda: arquivoDisc ? arquivoDisc.name : "Nenhum arquivo anexado na aba DISC.",
+              },
+            ].map((opcao) => (
+              <label key={opcao.rotulo} className="flex cursor-pointer items-start gap-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={opcao.marcado}
+                  onChange={(e) => opcao.alterar(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-primary"
+                />
+                <span>
+                  {opcao.rotulo}
+                  <span className="block text-xs text-muted-foreground">{opcao.ajuda}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              className="flex-1 rounded-xl"
+              disabled={exportando !== null}
+              onClick={() => exportar("docx")}
+            >
+              {exportando === "docx" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <FileText className="size-4" />
+              )}
+              Baixar .docx
+            </Button>
+            <Button
+              className="flex-1 rounded-xl"
+              disabled={exportando !== null}
+              onClick={() => exportar("pdf")}
+            >
+              {exportando === "pdf" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <FileType2 className="size-4" />
+              )}
+              Baixar .pdf
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <PoweredByFooter />
     </div>
   );
