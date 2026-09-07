@@ -124,45 +124,67 @@ export async function gerarPdf(
   escrever(`Transporte Próprio: (${sim}) SIM   (${nao}) NÃO`, { bold: true });
   if (dados.cidade) escrever(dados.cidade);
 
-  if (dados.objetivo) {
-    secao("Objetivo");
-    escrever(dados.objetivo, { align: "center" });
-  }
+  if (incluirCurriculo) {
+    if (dados.objetivo) {
+      secao("Objetivo");
+      escrever(dados.objetivo, { align: "center" });
+    }
 
-  if (dados.formacao.length) {
-    secao("Formação Acadêmica");
-    for (const item of dados.formacao) escrever(item);
-  }
+    if (dados.formacao.length) {
+      secao("Formação Acadêmica");
+      for (const item of dados.formacao) escrever(item);
+    }
 
-  if (dados.experiencias.length) {
-    secao("Experiência Profissional");
-    for (const exp of dados.experiencias) {
-      y += 3;
-      novaPaginaSePreciso(6);
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text(exp.empresa.toUpperCase(), M, y);
-      doc.text(exp.periodo, LARGURA - M, y, { align: "right" });
-      y += 5;
-      if (exp.descricaoEmpresa) {
-        escrever(`(${exp.descricaoEmpresa.replace(/^\(|\)$/g, "")})`, { italic: true, size: 9.5 });
+    if (dados.experiencias.length) {
+      secao("Experiência Profissional");
+      for (const exp of dados.experiencias) {
+        y += 3;
+        novaPaginaSePreciso(6);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.text(exp.empresa.toUpperCase(), M, y);
+        doc.text(exp.periodo, LARGURA - M, y, { align: "right" });
+        y += 5;
+        if (exp.descricaoEmpresa) {
+          escrever(`(${exp.descricaoEmpresa.replace(/^\(|\)$/g, "")})`, { italic: true, size: 9.5 });
+        }
+        if (exp.cargo) escrever(exp.cargo.toUpperCase(), { bold: true });
+        if (exp.atividades) escrever(exp.atividades, { align: "justify" });
       }
-      if (exp.cargo) escrever(exp.cargo.toUpperCase(), { bold: true });
-      if (exp.atividades) escrever(exp.atividades, { align: "justify" });
+    }
+
+    if (dados.competencias) {
+      escrever("Competências Técnicas", { bold: true, underline: true, espacoAntes: 5 });
+      y += 1.5;
+      escrever(dados.competencias, { align: "justify" });
+    }
+
+    escrever("ENTREVISTA REALIZADA", { bold: true, espacoAntes: 5 });
+    y += 1.5;
+    if (dados.entrevista) {
+      for (const paragrafo of dados.entrevista.split(/\n+/).filter(Boolean)) {
+        escrever(paragrafo, { align: "justify" });
+      }
     }
   }
 
-  if (dados.competencias) {
-    escrever("Competências Técnicas", { bold: true, underline: true, espacoAntes: 5 });
+  for (const [indice, anexo] of anexos.entries()) {
+    if (incluirCurriculo || indice > 0) {
+      doc.addPage();
+      enfeitarPagina();
+      y = 8 + logoH + 8;
+    }
+    escrever(anexo.titulo.toUpperCase(), { bold: true, underline: true });
     y += 1.5;
-    escrever(dados.competencias, { align: "justify" });
-  }
-
-  escrever("ENTREVISTA REALIZADA", { bold: true, espacoAntes: 5 });
-  y += 1.5;
-  if (dados.entrevista) {
-    for (const paragrafo of dados.entrevista.split(/\n+/).filter(Boolean)) {
+    for (const paragrafo of anexo.texto.split(/\n+/).filter(Boolean)) {
       escrever(paragrafo, { align: "justify" });
+    }
+    if (anexo.relato.trim()) {
+      escrever(`ANÁLISE ${anexo.titulo.toUpperCase()}`, { bold: true, espacoAntes: 5 });
+      y += 1.5;
+      for (const paragrafo of anexo.relato.split(/\n+/).filter(Boolean)) {
+        escrever(paragrafo, { align: "justify" });
+      }
     }
   }
 
