@@ -77,7 +77,7 @@ function LoginPage() {
       </section>
 
       {/* Painel de acesso */}
-      <section className="flex items-center justify-center px-8 py-16">
+      <section className="relative z-10 flex items-center justify-center px-8 py-16">
         <div className="glass w-full max-w-sm rounded-3xl p-8">
           <div className="text-center">
             <img
