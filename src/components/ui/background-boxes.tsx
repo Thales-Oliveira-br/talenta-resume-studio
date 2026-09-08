@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const COLORS = [
-  "hsl(230 30% 66%)",
-  "hsl(230 40% 55%)",
-  "hsl(230 40% 45%)",
-  "hsl(230 24% 82%)",
-  "hsl(230 40% 62%)",
+  "hsl(230 30% 66% / 50%)",
+  "hsl(230 40% 55% / 50%)",
+  "hsl(230 40% 45% / 50%)",
+  "hsl(230 24% 82% / 50%)",
+  "hsl(230 40% 62% / 50%)",
 ];
 
 const getRandomColor = (): string =>
@@ -34,9 +34,9 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
               key={`col-${j}`}
               whileHover={{
                 backgroundColor: getRandomColor(),
-                transition: { duration: 0 },
+                transition: { duration: 0.45, ease: "easeOut" },
               }}
-              transition={{ duration: 1.6 }}
+              transition={{ duration: 2.4, ease: "easeOut" }}
               className="relative h-12 w-12 shrink-0 border-b border-r border-border/30"
             >
               {j % 2 === 0 && i % 2 === 0 ? (
