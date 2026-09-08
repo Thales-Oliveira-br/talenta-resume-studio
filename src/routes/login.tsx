@@ -57,7 +57,7 @@ function LoginPage() {
       </div>
 
       {/* Painel de marca */}
-      <section className="relative flex flex-col justify-between px-8 py-10 lg:px-16 lg:py-14">
+      <section className="relative z-10 flex flex-col justify-between px-8 py-10 lg:px-16 lg:py-14">
         <p className="text-sm font-bold uppercase tracking-[0.2em] text-foreground">Talenta</p>
 
         <div className="max-w-md py-16">
