@@ -17,7 +17,8 @@ export const BoxesCore = ({ className, ...rest }: { className?: string }) => {
     "hsl(230 40% 30%)",
   ];
 
-  const getRandomColor = () => colors[Math.floor(Math.random() * colors.length)];
+  const getRandomColor = (): string =>
+    colors[Math.floor(Math.random() * colors.length)] ?? colors[0]!;
 
   return (
     <div
