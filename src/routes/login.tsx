@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { PoweredByFooter } from "@/components/PoweredByFooter";
 import { TalentaBackdrop } from "@/components/TalentaBackdrop";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Boxes } from "@/components/ui/background-boxes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
