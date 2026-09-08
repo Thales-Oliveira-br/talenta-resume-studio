@@ -49,15 +49,12 @@ function LoginPage() {
       <TalentaBackdrop />
 
       {/* Malha animada de fundo (somente no login) */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="pointer-events-auto absolute inset-0">
-          <Boxes />
-        </div>
-        <div className="absolute inset-0 bg-background/70 [mask-image:radial-gradient(transparent,white)]" />
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <Boxes />
       </div>
 
       {/* Painel de marca */}
-      <section className="relative z-10 flex flex-col justify-between px-8 py-10 lg:px-16 lg:py-14">
+      <section className="pointer-events-none relative z-10 flex flex-col justify-between px-8 py-10 lg:px-16 lg:py-14">
         <p className="text-sm font-bold uppercase tracking-[0.2em] text-foreground">Talenta</p>
 
         <div className="max-w-md py-16">
@@ -77,8 +74,8 @@ function LoginPage() {
       </section>
 
       {/* Painel de acesso */}
-      <section className="relative z-10 flex items-center justify-center px-8 py-16">
-        <div className="glass w-full max-w-sm rounded-3xl p-8">
+      <section className="pointer-events-none relative z-10 flex items-center justify-center px-8 py-16">
+        <div className="glass pointer-events-auto w-full max-w-sm rounded-3xl p-8">
           <div className="text-center">
             <img
               src={LOGO_URL}
