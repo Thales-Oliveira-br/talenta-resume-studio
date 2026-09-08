@@ -74,8 +74,8 @@ function LoginPage() {
       </section>
 
       {/* Painel de acesso */}
-      <section className="relative z-10 flex items-center justify-center px-8 py-16">
-        <div className="glass w-full max-w-sm rounded-3xl p-8">
+      <section className="pointer-events-none relative z-10 flex items-center justify-center px-8 py-16">
+        <div className="glass pointer-events-auto w-full max-w-sm rounded-3xl p-8">
           <div className="text-center">
             <img
               src={LOGO_URL}
