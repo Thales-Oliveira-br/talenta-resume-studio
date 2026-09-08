@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const COLORS = [
-  "hsl(230 30% 66%)",
-  "hsl(230 40% 55%)",
-  "hsl(230 40% 45%)",
-  "hsl(230 24% 82%)",
-  "hsl(230 40% 62%)",
+  "hsl(230 30% 66% / 50%)",
+  "hsl(230 40% 55% / 50%)",
+  "hsl(230 40% 45% / 50%)",
+  "hsl(230 24% 82% / 50%)",
+  "hsl(230 40% 62% / 50%)",
 ];
 
 const getRandomColor = (): string =>
