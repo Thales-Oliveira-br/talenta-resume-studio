@@ -44,8 +44,16 @@ function LoginPage() {
   }, [navigate]);
 
   return (
-    <main className="relative grid min-h-screen pb-16 grid-cols-1 lg:grid-cols-2">
+    <main className="relative grid min-h-screen overflow-hidden pb-16 grid-cols-1 lg:grid-cols-2">
       <TalentaBackdrop />
+
+      {/* Malha animada de fundo (somente no login) */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="pointer-events-auto absolute inset-0">
+          <Boxes />
+        </div>
+        <div className="absolute inset-0 bg-background/70 [mask-image:radial-gradient(transparent,white)]" />
+      </div>
 
       {/* Painel de marca */}
       <section className="relative flex flex-col justify-between px-8 py-10 lg:px-16 lg:py-14">
