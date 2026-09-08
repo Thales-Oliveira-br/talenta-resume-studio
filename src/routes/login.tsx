@@ -49,11 +49,8 @@ function LoginPage() {
       <TalentaBackdrop />
 
       {/* Malha animada de fundo (somente no login) */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="pointer-events-auto absolute inset-0">
-          <Boxes />
-        </div>
-        <div className="absolute inset-0 bg-background/70 [mask-image:radial-gradient(transparent,white)]" />
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <Boxes />
       </div>
 
       {/* Painel de marca */}
