@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import type { Curriculo } from "./resume-types";
+import type { Avaliacao, Curriculo } from "./resume-types";
 
 const M = 20; // margem em mm
 const LARGURA = 210;
@@ -30,7 +30,13 @@ async function carregarLogo(url: string): Promise<{ dataUrl: string; ratio: numb
   }
 }
 
-export type AnexoExportacao = { titulo: string; texto: string; relato: string };
+export type AnexoExportacao = {
+  titulo: string;
+  texto: string;
+  relato: string;
+  avaliacao?: Avaliacao | null;
+};
+
 
 export async function gerarPdf(
   dados: Curriculo,
