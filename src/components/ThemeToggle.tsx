@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+
+import { AnimatedThemeToggle } from "@/components/ui/animated-theme-toggle";
 
 const CHAVE = "talenta.tema";
 type Tema = "dark" | "light";
@@ -24,14 +25,5 @@ export function ThemeToggle({ className }: { className?: string }) {
     aplicar(proximo);
   };
 
-  return (
-    <button
-      type="button"
-      onClick={alternar}
-      aria-label={tema === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
-      className={`glass-soft inline-flex size-9 items-center justify-center rounded-xl text-foreground transition hover:bg-accent/50 ${className ?? ""}`}
-    >
-      {tema === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
-    </button>
-  );
+  return <AnimatedThemeToggle isDark={tema === "dark"} onToggle={alternar} className={className} />;
 }
