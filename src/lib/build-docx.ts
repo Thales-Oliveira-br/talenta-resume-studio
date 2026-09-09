@@ -11,7 +11,7 @@ import {
   TextRun,
   UnderlineType,
 } from "docx";
-import type { Curriculo } from "./resume-types";
+import type { Avaliacao, Curriculo } from "./resume-types";
 
 const FONTE = "Calibri";
 const CONTATO = {
@@ -53,7 +53,13 @@ function corpo(
   });
 }
 
-export type AnexoExportacao = { titulo: string; texto: string; relato: string };
+export type AnexoExportacao = {
+  titulo: string;
+  texto: string;
+  relato: string;
+  avaliacao?: Avaliacao | null;
+};
+
 
 export async function gerarDocx(
   dados: Curriculo,
