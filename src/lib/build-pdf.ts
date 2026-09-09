@@ -180,19 +180,51 @@ export async function gerarPdf(
       enfeitarPagina();
       y = 8 + logoH + 8;
     }
-    escrever(anexo.titulo.toUpperCase(), { bold: true, underline: true });
-    y += 1.5;
-    for (const paragrafo of anexo.texto.split(/\n+/).filter(Boolean)) {
-      escrever(paragrafo, { align: "justify" });
+    const av = anexo.avaliacao ?? null;
+    const rotulo = anexo.titulo.toUpperCase();
+    const tituloAnexo =
+      rotulo === "PDA"
+        ? "RELATÓRIO DE PERFIL COMPORTAMENTAL — PDA"
+        : rotulo === "DISC"
+          ? "RESULTADO DA PESQUISA DE PERFIL GERENCIAL — DISC"
+          : rotulo;
+
+    escrever(tituloAnexo, { bold: true, underline: true, align: "center", size: 12 });
+    y += 2;
+
+    if (av) {
+      if (av.candidato) escrever(av.candidato.toUpperCase(), { bold: true });
+      const linha = [av.perfil, av.data && `Data: ${av.data}`].filter(Boolean).join("  |  ");
+      if (linha) escrever(linha, { italic: true, size: 10 });
+
+      if (av.resumo) {
+        secao("Síntese do Perfil");
+        escrever(av.resumo, { align: "justify" });
+      }
+      if (av.palavras.length) {
+        secao("Palavras Descritivas");
+        escrever(av.palavras.join(" | "), { align: "justify" });
+      }
+      for (const bloco of av.secoes) {
+        secao(bloco.titulo);
+        for (const paragrafo of bloco.paragrafos.filter(Boolean)) {
+          escrever(paragrafo, { align: "justify" });
+        }
+      }
+    } else {
+      for (const paragrafo of anexo.texto.split(/\n+/).filter(Boolean)) {
+        escrever(paragrafo, { align: "justify" });
+      }
     }
+
     if (anexo.relato.trim()) {
-      escrever(`ANÁLISE ${anexo.titulo.toUpperCase()}`, { bold: true, espacoAntes: 5 });
-      y += 1.5;
+      secao(`Análise da Consultoria — ${rotulo}`);
       for (const paragrafo of anexo.relato.split(/\n+/).filter(Boolean)) {
         escrever(paragrafo, { align: "justify" });
       }
     }
   }
+
 
   return doc.output("blob");
 }
