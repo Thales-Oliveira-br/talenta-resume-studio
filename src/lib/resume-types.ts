@@ -20,7 +20,23 @@ export type Curriculo = {
   entrevista: string;
 };
 
+export type AvaliacaoSecao = {
+  titulo: string;
+  paragrafos: string[];
+};
+
+export type Avaliacao = {
+  tipo: "PDA" | "DISC";
+  candidato: string;
+  data: string;
+  perfil: string;
+  resumo: string;
+  palavras: string[];
+  secoes: AvaliacaoSecao[];
+};
+
 export const CURRICULO_VAZIO: Curriculo = {
+
   nome: "",
   dataNascimento: "",
   email: "",

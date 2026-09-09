@@ -11,7 +11,7 @@ import {
   TextRun,
   UnderlineType,
 } from "docx";
-import type { Curriculo } from "./resume-types";
+import type { Avaliacao, Curriculo } from "./resume-types";
 
 const FONTE = "Calibri";
 const CONTATO = {
@@ -53,7 +53,13 @@ function corpo(
   });
 }
 
-export type AnexoExportacao = { titulo: string; texto: string; relato: string };
+export type AnexoExportacao = {
+  titulo: string;
+  texto: string;
+  relato: string;
+  avaliacao?: Avaliacao | null;
+};
+
 
 export async function gerarDocx(
   dados: Curriculo,
@@ -190,28 +196,58 @@ export async function gerarDocx(
   }
 
   for (const [indice, anexo] of anexos.entries()) {
+    const av = anexo.avaliacao ?? null;
+    const tituloAnexo =
+      anexo.titulo.toUpperCase() === "PDA"
+        ? "RELATÓRIO DE PERFIL COMPORTAMENTAL — PDA"
+        : anexo.titulo.toUpperCase() === "DISC"
+          ? "RESULTADO DA PESQUISA DE PERFIL GERENCIAL — DISC"
+          : anexo.titulo.toUpperCase();
+
     conteudo.push(
       new Paragraph({
         pageBreakBefore: incluirCurriculo || indice > 0,
+        alignment: AlignmentType.CENTER,
         spacing: { before: 240, after: 120 },
-        children: [texto(anexo.titulo.toUpperCase(), { bold: true, underline: true })],
+        children: [texto(tituloAnexo, { bold: true, underline: true })],
       }),
     );
-    for (const paragrafo of anexo.texto.split(/\n+/).filter(Boolean)) {
-      conteudo.push(corpo(paragrafo, { align: AlignmentType.JUSTIFIED }));
+
+    if (av) {
+      if (av.candidato) conteudo.push(corpo(av.candidato.toUpperCase(), { bold: true }));
+      const linha = [av.perfil, av.data && `Data: ${av.data}`].filter(Boolean).join("  |  ");
+      if (linha) conteudo.push(corpo(linha, { italics: true }));
+
+      if (av.resumo) {
+        conteudo.push(secao("Síntese do Perfil"));
+        conteudo.push(corpo(av.resumo, { align: AlignmentType.JUSTIFIED }));
+      }
+
+      if (av.palavras.length) {
+        conteudo.push(secao("Palavras Descritivas"));
+        conteudo.push(corpo(av.palavras.join(" | "), { align: AlignmentType.JUSTIFIED }));
+      }
+
+      for (const bloco of av.secoes) {
+        conteudo.push(secao(bloco.titulo));
+        for (const paragrafo of bloco.paragrafos.filter(Boolean)) {
+          conteudo.push(corpo(paragrafo, { align: AlignmentType.JUSTIFIED }));
+        }
+      }
+    } else {
+      for (const paragrafo of anexo.texto.split(/\n+/).filter(Boolean)) {
+        conteudo.push(corpo(paragrafo, { align: AlignmentType.JUSTIFIED }));
+      }
     }
+
     if (anexo.relato.trim()) {
-      conteudo.push(
-        new Paragraph({
-          spacing: { before: 240, after: 120 },
-          children: [texto(`ANÁLISE ${anexo.titulo.toUpperCase()}`, { bold: true })],
-        }),
-      );
+      conteudo.push(secao(`Análise da Consultoria — ${anexo.titulo.toUpperCase()}`));
       for (const paragrafo of anexo.relato.split(/\n+/).filter(Boolean)) {
         conteudo.push(corpo(paragrafo, { align: AlignmentType.JUSTIFIED }));
       }
     }
   }
+
 
 
   const doc = new Document({
