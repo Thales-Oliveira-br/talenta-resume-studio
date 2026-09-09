@@ -10,7 +10,7 @@ export const AnimatedThemeToggle = ({
 }: {
   isDark: boolean;
   onToggle: () => void;
-  className?: string;
+  className?: string | undefined;
 }) => {
   return (
     <Button
