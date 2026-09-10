@@ -158,21 +158,35 @@ function TalentaApp() {
   };
 
   const montarAnexos = async () => {
-    const lista: { titulo: string; texto: string; relato: string }[] = [];
+    const lista: {
+      titulo: string;
+      texto: string;
+      relato: string;
+      avaliacao: Avaliacao | null;
+    }[] = [];
+
+    const preparar = async (tipo: "PDA" | "DISC", arq: File, relatoItem: string) => {
+      const texto = await extractTextFromFile(arq);
+      if (texto.trim().length < 30) {
+        throw new Error(
+          `Não foi possível ler texto no arquivo do ${tipo} (pode ser um PDF digitalizado). Envie um PDF com texto selecionável, DOCX ou TXT.`,
+        );
+      }
+      const avaliacao = (await padronizarAv({ data: { tipo, texto } })) as Avaliacao;
+      lista.push({ titulo: tipo, texto, relato: relatoItem, avaliacao });
+    };
+
     if (incPda) {
       if (!arquivoPda) throw new Error("Anexe o arquivo do PDA na aba PDA.");
-      lista.push({ titulo: "PDA", texto: await extractTextFromFile(arquivoPda), relato: relatoPda });
+      await preparar("PDA", arquivoPda, relatoPda);
     }
     if (incDisc) {
       if (!arquivoDisc) throw new Error("Anexe o arquivo do DISC na aba DISC.");
-      lista.push({
-        titulo: "DISC",
-        texto: await extractTextFromFile(arquivoDisc),
-        relato: relatoDisc,
-      });
+      await preparar("DISC", arquivoDisc, relatoDisc);
     }
     return lista;
   };
+
 
   const sufixoArquivo = () =>
     [incCurriculo && "CURRICULO", incPda && "PDA", incDisc && "DISC"].filter(Boolean).join("_");
