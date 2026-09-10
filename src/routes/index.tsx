@@ -93,6 +93,10 @@ function TalentaApp() {
   const [arquivoDisc, setArquivoDisc] = useState<File | null>(null);
   const [relatoPda, setRelatoPda] = useState("");
   const [relatoDisc, setRelatoDisc] = useState("");
+  const [avaliacaoPda, setAvaliacaoPda] = useState<Avaliacao | null>(null);
+  const [avaliacaoDisc, setAvaliacaoDisc] = useState<Avaliacao | null>(null);
+  const [padronizandoAv, setPadronizandoAv] = useState<"PDA" | "DISC" | null>(null);
+
 
   const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
   const [opcoesAberto, setOpcoesAberto] = useState(false);
@@ -156,8 +160,46 @@ function TalentaApp() {
     setArquivoDisc(null);
     setRelatoPda("");
     setRelatoDisc("");
+    setAvaliacaoPda(null);
+    setAvaliacaoDisc(null);
+
     if (inputRef.current) inputRef.current.value = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const lerAvaliacao = async (tipo: "PDA" | "DISC", arq: File) => {
+    const texto = await extractTextFromFile(arq);
+    if (texto.trim().length < 30) {
+      throw new Error(
+        `Não foi possível ler texto no arquivo do ${tipo} (pode ser um PDF digitalizado). Envie um PDF com texto selecionável, DOCX ou TXT.`,
+      );
+    }
+    const avaliacao = (await padronizarAv({ data: { tipo, texto } })) as Avaliacao;
+    return { texto, avaliacao };
+  };
+
+  const padronizarAnexo = async (tipo: "PDA" | "DISC") => {
+    const arq = tipo === "PDA" ? arquivoPda : arquivoDisc;
+    if (!arq) {
+      toast.error(`Anexe o arquivo do ${tipo}.`);
+      return;
+    }
+    setPadronizandoAv(tipo);
+    try {
+      const { avaliacao } = await lerAvaliacao(tipo, arq);
+      if (tipo === "PDA") {
+        setAvaliacaoPda(avaliacao);
+        setIncPda(true);
+      } else {
+        setAvaliacaoDisc(avaliacao);
+        setIncDisc(true);
+      }
+      toast.success(`${tipo} padronizado no modelo da empresa.`);
+    } catch (erro) {
+      toast.error((erro as Error).message || `Não foi possível padronizar o ${tipo}.`);
+    } finally {
+      setPadronizandoAv(null);
+    }
   };
 
   const montarAnexos = async () => {
@@ -168,27 +210,33 @@ function TalentaApp() {
       avaliacao: Avaliacao | null;
     }[] = [];
 
-    const preparar = async (tipo: "PDA" | "DISC", arq: File, relatoItem: string) => {
-      const texto = await extractTextFromFile(arq);
-      if (texto.trim().length < 30) {
-        throw new Error(
-          `Não foi possível ler texto no arquivo do ${tipo} (pode ser um PDF digitalizado). Envie um PDF com texto selecionável, DOCX ou TXT.`,
-        );
+    const preparar = async (
+      tipo: "PDA" | "DISC",
+      arq: File,
+      relatoItem: string,
+      cache: Avaliacao | null,
+    ) => {
+      if (cache) {
+        lista.push({ titulo: tipo, texto: "", relato: relatoItem, avaliacao: cache });
+        return;
       }
-      const avaliacao = (await padronizarAv({ data: { tipo, texto } })) as Avaliacao;
+      const { texto, avaliacao } = await lerAvaliacao(tipo, arq);
+      if (tipo === "PDA") setAvaliacaoPda(avaliacao);
+      else setAvaliacaoDisc(avaliacao);
       lista.push({ titulo: tipo, texto, relato: relatoItem, avaliacao });
     };
 
     if (incPda) {
       if (!arquivoPda) throw new Error("Anexe o arquivo do PDA na aba PDA.");
-      await preparar("PDA", arquivoPda, relatoPda);
+      await preparar("PDA", arquivoPda, relatoPda, avaliacaoPda);
     }
     if (incDisc) {
       if (!arquivoDisc) throw new Error("Anexe o arquivo do DISC na aba DISC.");
-      await preparar("DISC", arquivoDisc, relatoDisc);
+      await preparar("DISC", arquivoDisc, relatoDisc, avaliacaoDisc);
     }
     return lista;
   };
+
 
 
   const sufixoArquivo = () =>
@@ -409,11 +457,18 @@ function TalentaApp() {
               <AnexoExtra
                 titulo="Arquivo do PDA"
                 arquivo={arquivoPda}
-                onArquivo={setArquivoPda}
+                onArquivo={(f) => {
+                  setArquivoPda(f);
+                  setAvaliacaoPda(null);
+                }}
                 rotuloRelato="Relato do PDA"
                 relato={relatoPda}
                 onRelato={setRelatoPda}
                 idRelato="relato-pda"
+                rotuloBotao="Padronizar PDA"
+                processando={padronizandoAv === "PDA"}
+                pronto={avaliacaoPda !== null}
+                onPadronizar={() => padronizarAnexo("PDA")}
               />
             </TabsContent>
 
@@ -421,13 +476,21 @@ function TalentaApp() {
               <AnexoExtra
                 titulo="Arquivo do DISC"
                 arquivo={arquivoDisc}
-                onArquivo={setArquivoDisc}
+                onArquivo={(f) => {
+                  setArquivoDisc(f);
+                  setAvaliacaoDisc(null);
+                }}
                 rotuloRelato="Relato do DISC"
                 relato={relatoDisc}
                 onRelato={setRelatoDisc}
                 idRelato="relato-disc"
+                rotuloBotao="Padronizar DISC"
+                processando={padronizandoAv === "DISC"}
+                pronto={avaliacaoDisc !== null}
+                onPadronizar={() => padronizarAnexo("DISC")}
               />
             </TabsContent>
+
           </Tabs>
         </section>
 
@@ -633,6 +696,10 @@ function AnexoExtra({
   relato,
   onRelato,
   idRelato,
+  rotuloBotao,
+  processando,
+  pronto,
+  onPadronizar,
 }: {
   titulo: string;
   arquivo: File | null;
@@ -641,7 +708,12 @@ function AnexoExtra({
   relato: string;
   onRelato: (v: string) => void;
   idRelato: string;
+  rotuloBotao: string;
+  processando: boolean;
+  pronto: boolean;
+  onPadronizar: () => void;
 }) {
+
   const ref = useRef<HTMLInputElement>(null);
   const [arrastando, setArrastando] = useState(false);
 
@@ -715,6 +787,29 @@ function AnexoExtra({
           className="glass-input mt-2 resize-y"
         />
       </div>
+
+      <Button
+        className="w-full rounded-xl"
+        disabled={!arquivo || processando}
+        onClick={onPadronizar}
+      >
+        {processando ? (
+          <>
+            <Loader2 className="size-4 animate-spin" /> Lendo e padronizando...
+          </>
+        ) : (
+          <>
+            <Sparkles className="size-4" /> {rotuloBotao}
+          </>
+        )}
+      </Button>
+
+      {pronto && !processando && (
+        <p className="rounded-xl border border-success/40 bg-success/10 px-4 py-3 text-xs text-success">
+          Conteúdo padronizado e pronto para entrar na exportação.
+        </p>
+      )}
+
     </div>
   );
 }
