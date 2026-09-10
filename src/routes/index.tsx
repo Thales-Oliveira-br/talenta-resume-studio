@@ -93,6 +93,10 @@ function TalentaApp() {
   const [arquivoDisc, setArquivoDisc] = useState<File | null>(null);
   const [relatoPda, setRelatoPda] = useState("");
   const [relatoDisc, setRelatoDisc] = useState("");
+  const [avaliacaoPda, setAvaliacaoPda] = useState<Avaliacao | null>(null);
+  const [avaliacaoDisc, setAvaliacaoDisc] = useState<Avaliacao | null>(null);
+  const [padronizandoAv, setPadronizandoAv] = useState<"PDA" | "DISC" | null>(null);
+
 
   const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
   const [opcoesAberto, setOpcoesAberto] = useState(false);
@@ -160,6 +164,41 @@ function TalentaApp() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const lerAvaliacao = async (tipo: "PDA" | "DISC", arq: File) => {
+    const texto = await extractTextFromFile(arq);
+    if (texto.trim().length < 30) {
+      throw new Error(
+        `Não foi possível ler texto no arquivo do ${tipo} (pode ser um PDF digitalizado). Envie um PDF com texto selecionável, DOCX ou TXT.`,
+      );
+    }
+    const avaliacao = (await padronizarAv({ data: { tipo, texto } })) as Avaliacao;
+    return { texto, avaliacao };
+  };
+
+  const padronizarAnexo = async (tipo: "PDA" | "DISC") => {
+    const arq = tipo === "PDA" ? arquivoPda : arquivoDisc;
+    if (!arq) {
+      toast.error(`Anexe o arquivo do ${tipo}.`);
+      return;
+    }
+    setPadronizandoAv(tipo);
+    try {
+      const { avaliacao } = await lerAvaliacao(tipo, arq);
+      if (tipo === "PDA") {
+        setAvaliacaoPda(avaliacao);
+        setIncPda(true);
+      } else {
+        setAvaliacaoDisc(avaliacao);
+        setIncDisc(true);
+      }
+      toast.success(`${tipo} padronizado no modelo da empresa.`);
+    } catch (erro) {
+      toast.error((erro as Error).message || `Não foi possível padronizar o ${tipo}.`);
+    } finally {
+      setPadronizandoAv(null);
+    }
+  };
+
   const montarAnexos = async () => {
     const lista: {
       titulo: string;
@@ -168,27 +207,33 @@ function TalentaApp() {
       avaliacao: Avaliacao | null;
     }[] = [];
 
-    const preparar = async (tipo: "PDA" | "DISC", arq: File, relatoItem: string) => {
-      const texto = await extractTextFromFile(arq);
-      if (texto.trim().length < 30) {
-        throw new Error(
-          `Não foi possível ler texto no arquivo do ${tipo} (pode ser um PDF digitalizado). Envie um PDF com texto selecionável, DOCX ou TXT.`,
-        );
+    const preparar = async (
+      tipo: "PDA" | "DISC",
+      arq: File,
+      relatoItem: string,
+      cache: Avaliacao | null,
+    ) => {
+      if (cache) {
+        lista.push({ titulo: tipo, texto: "", relato: relatoItem, avaliacao: cache });
+        return;
       }
-      const avaliacao = (await padronizarAv({ data: { tipo, texto } })) as Avaliacao;
+      const { texto, avaliacao } = await lerAvaliacao(tipo, arq);
+      if (tipo === "PDA") setAvaliacaoPda(avaliacao);
+      else setAvaliacaoDisc(avaliacao);
       lista.push({ titulo: tipo, texto, relato: relatoItem, avaliacao });
     };
 
     if (incPda) {
       if (!arquivoPda) throw new Error("Anexe o arquivo do PDA na aba PDA.");
-      await preparar("PDA", arquivoPda, relatoPda);
+      await preparar("PDA", arquivoPda, relatoPda, avaliacaoPda);
     }
     if (incDisc) {
       if (!arquivoDisc) throw new Error("Anexe o arquivo do DISC na aba DISC.");
-      await preparar("DISC", arquivoDisc, relatoDisc);
+      await preparar("DISC", arquivoDisc, relatoDisc, avaliacaoDisc);
     }
     return lista;
   };
+
 
 
   const sufixoArquivo = () =>
