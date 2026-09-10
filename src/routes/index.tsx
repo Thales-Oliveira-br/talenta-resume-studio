@@ -787,6 +787,29 @@ function AnexoExtra({
           className="glass-input mt-2 resize-y"
         />
       </div>
+
+      <Button
+        className="w-full rounded-xl"
+        disabled={!arquivo || processando}
+        onClick={onPadronizar}
+      >
+        {processando ? (
+          <>
+            <Loader2 className="size-4 animate-spin" /> Lendo e padronizando...
+          </>
+        ) : (
+          <>
+            <Sparkles className="size-4" /> {rotuloBotao}
+          </>
+        )}
+      </Button>
+
+      {pronto && !processando && (
+        <p className="rounded-xl border border-success/40 bg-success/10 px-4 py-3 text-xs text-success">
+          Conteúdo padronizado e pronto para entrar na exportação.
+        </p>
+      )}
+
     </div>
   );
 }
