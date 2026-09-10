@@ -31,8 +31,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
 import { estaLogado, sair } from "@/lib/session";
-import { padronizarCurriculo } from "@/lib/resume.functions";
-import type { Curriculo } from "@/lib/resume-types";
+import { padronizarAvaliacao, padronizarCurriculo } from "@/lib/resume.functions";
+import type { Avaliacao, Curriculo } from "@/lib/resume-types";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -106,6 +107,8 @@ function TalentaApp() {
   }, [navigate]);
 
   const padronizar = useServerFn(padronizarCurriculo);
+  const padronizarAv = useServerFn(padronizarAvaliacao);
+
 
   const processar = useMutation({
     mutationFn: async () => {
