@@ -160,6 +160,9 @@ function TalentaApp() {
     setArquivoDisc(null);
     setRelatoPda("");
     setRelatoDisc("");
+    setAvaliacaoPda(null);
+    setAvaliacaoDisc(null);
+
     if (inputRef.current) inputRef.current.value = "";
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -454,11 +457,18 @@ function TalentaApp() {
               <AnexoExtra
                 titulo="Arquivo do PDA"
                 arquivo={arquivoPda}
-                onArquivo={setArquivoPda}
+                onArquivo={(f) => {
+                  setArquivoPda(f);
+                  setAvaliacaoPda(null);
+                }}
                 rotuloRelato="Relato do PDA"
                 relato={relatoPda}
                 onRelato={setRelatoPda}
                 idRelato="relato-pda"
+                rotuloBotao="Padronizar PDA"
+                processando={padronizandoAv === "PDA"}
+                pronto={avaliacaoPda !== null}
+                onPadronizar={() => padronizarAnexo("PDA")}
               />
             </TabsContent>
 
@@ -466,13 +476,21 @@ function TalentaApp() {
               <AnexoExtra
                 titulo="Arquivo do DISC"
                 arquivo={arquivoDisc}
-                onArquivo={setArquivoDisc}
+                onArquivo={(f) => {
+                  setArquivoDisc(f);
+                  setAvaliacaoDisc(null);
+                }}
                 rotuloRelato="Relato do DISC"
                 relato={relatoDisc}
                 onRelato={setRelatoDisc}
                 idRelato="relato-disc"
+                rotuloBotao="Padronizar DISC"
+                processando={padronizandoAv === "DISC"}
+                pronto={avaliacaoDisc !== null}
+                onPadronizar={() => padronizarAnexo("DISC")}
               />
             </TabsContent>
+
           </Tabs>
         </section>
 
