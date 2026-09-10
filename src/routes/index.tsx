@@ -696,6 +696,10 @@ function AnexoExtra({
   relato,
   onRelato,
   idRelato,
+  rotuloBotao,
+  processando,
+  pronto,
+  onPadronizar,
 }: {
   titulo: string;
   arquivo: File | null;
@@ -704,7 +708,12 @@ function AnexoExtra({
   relato: string;
   onRelato: (v: string) => void;
   idRelato: string;
+  rotuloBotao: string;
+  processando: boolean;
+  pronto: boolean;
+  onPadronizar: () => void;
 }) {
+
   const ref = useRef<HTMLInputElement>(null);
   const [arrastando, setArrastando] = useState(false);
 
