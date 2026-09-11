@@ -133,7 +133,7 @@ function LoginPage() {
 
             {erro && <p className="text-xs font-medium text-destructive">{erro}</p>}
 
-            <Button type="submit" className="w-full font-semibold">
+            <Button type="submit" variant="dockPrimary" className="w-full">
               Entrar no sistema
             </Button>
 
