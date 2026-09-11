@@ -240,20 +240,27 @@ function TalentaApp() {
 
 
   const sufixoArquivo = () =>
-    [incCurriculo && "CURRICULO", incPda && "PDA", incDisc && "DISC"].filter(Boolean).join("_");
+    [incCurriculo && "CURRICULO", incPda && "PDA", incDisc && "DISC"].filter(Boolean).join("_") ||
+    "DOCUMENTO";
 
   const exportar = async (formato: "docx" | "pdf") => {
-    if (!dados) return;
     if (!incCurriculo && !incPda && !incDisc) {
       toast.error("Selecione ao menos um documento para exportar.");
       return;
     }
+    if (incCurriculo && !dados) {
+      toast.error("Padronize o currículo na aba Currículo antes de incluí-lo na exportação.");
+      return;
+    }
     setExportando(formato);
     try {
-      const registro = montarRegistro(dados);
+      const registro = dados ? montarRegistro(dados) : CURRICULO_VAZIO;
       const anexos = await montarAnexos();
-      const opts = { incluirCurriculo: incCurriculo, anexos };
-      const nome = `${nomeBase(dados).replace(/^CURRICULO/, sufixoArquivo())}`;
+      const incluir = incCurriculo && dados !== null;
+      const opts = { incluirCurriculo: incluir, anexos };
+      const nome = dados
+        ? nomeBase(dados).replace(/^CURRICULO/, sufixoArquivo())
+        : `${sufixoArquivo()}_PADRONIZADO`;
       if (formato === "docx") {
         const { gerarDocx } = await import("@/lib/build-docx");
         baixar(await gerarDocx(registro, ERS_LOGO_URL, opts), `${nome}.docx`);
