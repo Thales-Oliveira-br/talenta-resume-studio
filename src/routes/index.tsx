@@ -294,9 +294,9 @@ function TalentaApp() {
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <Button
-            variant="ghost"
+            variant="dock"
             size="sm"
-            className="rounded-xl"
+            className="rounded-2xl"
             onClick={() => {
               sair();
               navigate({ to: "/login", replace: true });
@@ -323,8 +323,8 @@ function TalentaApp() {
           </p>
           <div className="flex flex-wrap gap-2">
             <Button
-              variant="outline"
-              className="rounded-xl"
+              variant="dock"
+              className="rounded-2xl"
               disabled={exportando !== null}
               onClick={() => setOpcoesAberto(true)}
             >
@@ -332,8 +332,8 @@ function TalentaApp() {
               Opções de exportação
             </Button>
             <Button
-              variant="ghost"
-              className="rounded-xl"
+              variant="dock"
+              className="rounded-2xl"
               disabled={exportando !== null}
               onClick={reiniciar}
             >
@@ -466,7 +466,8 @@ function TalentaApp() {
               </div>
 
               <Button
-                className="w-full rounded-xl"
+                variant="dockPrimary"
+                className="w-full rounded-2xl"
                 disabled={!arquivo || processar.isPending}
                 onClick={() => processar.mutate()}
               >
@@ -544,8 +545,8 @@ function TalentaApp() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button
-                  variant="secondary"
-                  className="rounded-xl"
+                  variant="dock"
+                  className="rounded-2xl"
                   disabled={exportando !== null}
                   onClick={() => exportar("docx")}
                 >
@@ -557,7 +558,8 @@ function TalentaApp() {
                   .docx
                 </Button>
                 <Button
-                  className="rounded-xl"
+                  variant="dockPrimary"
+                  className="rounded-2xl"
                   disabled={exportando !== null}
                   onClick={() => exportar("pdf")}
                 >
@@ -665,8 +667,8 @@ function TalentaApp() {
 
           <div className="flex flex-wrap gap-2">
             <Button
-              variant="secondary"
-              className="flex-1 rounded-xl"
+              variant="dock"
+              className="flex-1 rounded-2xl"
               disabled={exportando !== null}
               onClick={() => exportar("docx")}
             >
@@ -678,7 +680,8 @@ function TalentaApp() {
               Baixar .docx
             </Button>
             <Button
-              className="flex-1 rounded-xl"
+              variant="dockPrimary"
+              className="flex-1 rounded-2xl"
               disabled={exportando !== null}
               onClick={() => exportar("pdf")}
             >
@@ -808,7 +811,8 @@ function AnexoExtra({
       </div>
 
       <Button
-        className="w-full rounded-xl"
+        variant="dockPrimary"
+        className="w-full rounded-2xl"
         disabled={!arquivo || processando}
         onClick={onPadronizar}
       >
