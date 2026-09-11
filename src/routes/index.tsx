@@ -32,6 +32,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
 import { estaLogado, sair } from "@/lib/session";
 import { padronizarAvaliacao, padronizarCurriculo } from "@/lib/resume.functions";
+import { CURRICULO_VAZIO } from "@/lib/resume-types";
 import type { Avaliacao, Curriculo } from "@/lib/resume-types";
 
 
