@@ -316,7 +316,33 @@ function TalentaApp() {
           qualquer modelo em PDF ou DOCX — a saída sai sempre no layout oficial.
         </p>
 
-        <section className="glass mt-8 rounded-3xl p-6 sm:p-8">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            Padronize os documentos que precisar — individualmente ou todos — e exporte junto.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              disabled={exportando !== null}
+              onClick={() => setOpcoesAberto(true)}
+            >
+              <Settings2 className="size-4" />
+              Opções de exportação
+            </Button>
+            <Button
+              variant="ghost"
+              className="rounded-xl"
+              disabled={exportando !== null}
+              onClick={reiniciar}
+            >
+              <RotateCcw className="size-4" />
+              Começar de novo
+            </Button>
+          </div>
+        </div>
+
+        <section className="glass mt-4 rounded-3xl p-6 sm:p-8">
           <Tabs defaultValue="curriculo" className="w-full">
             <TabsList className="glass-soft grid w-full grid-cols-3 rounded-2xl p-1">
               <TabsTrigger value="curriculo" className="rounded-xl">
