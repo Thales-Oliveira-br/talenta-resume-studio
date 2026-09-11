@@ -631,7 +631,9 @@ function TalentaApp() {
                 rotulo: "Currículo",
                 marcado: incCurriculo,
                 alterar: setIncCurriculo,
-                ajuda: "Currículo padronizado e relato da entrevista.",
+                ajuda: dados
+                  ? "Currículo padronizado e relato da entrevista."
+                  : "Padronize o currículo na aba Currículo para incluí-lo.",
               },
               {
                 rotulo: "PDA",
