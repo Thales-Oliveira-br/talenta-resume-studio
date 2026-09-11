@@ -129,6 +129,7 @@ function TalentaApp() {
     onSuccess: (resultado) => {
       setFalha(null);
       setDados(resultado as Curriculo);
+      setIncCurriculo(true);
       toast.success("Currículo padronizado no modelo da empresa.");
     },
     onError: (erro: Error) => {
