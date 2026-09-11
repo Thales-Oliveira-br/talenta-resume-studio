@@ -544,24 +544,6 @@ function TalentaApp() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button
-                  variant="ghost"
-                  className="rounded-xl"
-                  disabled={exportando !== null}
-                  onClick={reiniciar}
-                >
-                  <RotateCcw className="size-4" />
-                  Enviar novo currículo
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-xl"
-                  disabled={exportando !== null}
-                  onClick={() => setOpcoesAberto(true)}
-                >
-                  <Settings2 className="size-4" />
-                  Opções de exportação
-                </Button>
-                <Button
                   variant="secondary"
                   className="rounded-xl"
                   disabled={exportando !== null}
