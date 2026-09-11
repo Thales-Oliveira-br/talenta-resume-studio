@@ -32,6 +32,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
 import { estaLogado, sair } from "@/lib/session";
 import { padronizarAvaliacao, padronizarCurriculo } from "@/lib/resume.functions";
+import { CURRICULO_VAZIO } from "@/lib/resume-types";
 import type { Avaliacao, Curriculo } from "@/lib/resume-types";
 
 
@@ -100,7 +101,7 @@ function TalentaApp() {
 
   const [exportando, setExportando] = useState<"docx" | "pdf" | null>(null);
   const [opcoesAberto, setOpcoesAberto] = useState(false);
-  const [incCurriculo, setIncCurriculo] = useState(true);
+  const [incCurriculo, setIncCurriculo] = useState(false);
   const [incPda, setIncPda] = useState(false);
   const [incDisc, setIncDisc] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -128,6 +129,7 @@ function TalentaApp() {
     onSuccess: (resultado) => {
       setFalha(null);
       setDados(resultado as Curriculo);
+      setIncCurriculo(true);
       toast.success("Currículo padronizado no modelo da empresa.");
     },
     onError: (erro: Error) => {
@@ -240,20 +242,27 @@ function TalentaApp() {
 
 
   const sufixoArquivo = () =>
-    [incCurriculo && "CURRICULO", incPda && "PDA", incDisc && "DISC"].filter(Boolean).join("_");
+    [incCurriculo && "CURRICULO", incPda && "PDA", incDisc && "DISC"].filter(Boolean).join("_") ||
+    "DOCUMENTO";
 
   const exportar = async (formato: "docx" | "pdf") => {
-    if (!dados) return;
     if (!incCurriculo && !incPda && !incDisc) {
       toast.error("Selecione ao menos um documento para exportar.");
       return;
     }
+    if (incCurriculo && !dados) {
+      toast.error("Padronize o currículo na aba Currículo antes de incluí-lo na exportação.");
+      return;
+    }
     setExportando(formato);
     try {
-      const registro = montarRegistro(dados);
+      const registro = dados ? montarRegistro(dados) : CURRICULO_VAZIO;
       const anexos = await montarAnexos();
-      const opts = { incluirCurriculo: incCurriculo, anexos };
-      const nome = `${nomeBase(dados).replace(/^CURRICULO/, sufixoArquivo())}`;
+      const incluir = incCurriculo && dados !== null;
+      const opts = { incluirCurriculo: incluir, anexos };
+      const nome = dados
+        ? nomeBase(dados).replace(/^CURRICULO/, sufixoArquivo())
+        : `${sufixoArquivo()}_PADRONIZADO`;
       if (formato === "docx") {
         const { gerarDocx } = await import("@/lib/build-docx");
         baixar(await gerarDocx(registro, ERS_LOGO_URL, opts), `${nome}.docx`);
@@ -308,7 +317,33 @@ function TalentaApp() {
           qualquer modelo em PDF ou DOCX — a saída sai sempre no layout oficial.
         </p>
 
-        <section className="glass mt-8 rounded-3xl p-6 sm:p-8">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            Padronize os documentos que precisar — individualmente ou todos — e exporte junto.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              disabled={exportando !== null}
+              onClick={() => setOpcoesAberto(true)}
+            >
+              <Settings2 className="size-4" />
+              Opções de exportação
+            </Button>
+            <Button
+              variant="ghost"
+              className="rounded-xl"
+              disabled={exportando !== null}
+              onClick={reiniciar}
+            >
+              <RotateCcw className="size-4" />
+              Começar de novo
+            </Button>
+          </div>
+        </div>
+
+        <section className="glass mt-4 rounded-3xl p-6 sm:p-8">
           <Tabs defaultValue="curriculo" className="w-full">
             <TabsList className="glass-soft grid w-full grid-cols-3 rounded-2xl p-1">
               <TabsTrigger value="curriculo" className="rounded-xl">
@@ -509,24 +544,6 @@ function TalentaApp() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button
-                  variant="ghost"
-                  className="rounded-xl"
-                  disabled={exportando !== null}
-                  onClick={reiniciar}
-                >
-                  <RotateCcw className="size-4" />
-                  Enviar novo currículo
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-xl"
-                  disabled={exportando !== null}
-                  onClick={() => setOpcoesAberto(true)}
-                >
-                  <Settings2 className="size-4" />
-                  Opções de exportação
-                </Button>
-                <Button
                   variant="secondary"
                   className="rounded-xl"
                   disabled={exportando !== null}
@@ -614,7 +631,9 @@ function TalentaApp() {
                 rotulo: "Currículo",
                 marcado: incCurriculo,
                 alterar: setIncCurriculo,
-                ajuda: "Currículo padronizado e relato da entrevista.",
+                ajuda: dados
+                  ? "Currículo padronizado e relato da entrevista."
+                  : "Padronize o currículo na aba Currículo para incluí-lo.",
               },
               {
                 rotulo: "PDA",
