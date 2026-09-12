@@ -27,6 +27,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/material-design-3-switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { extractTextFromFile } from "@/lib/extract-text";
@@ -435,34 +436,38 @@ function TalentaApp() {
               </div>
 
               <div className="glass-soft space-y-3 rounded-2xl p-4">
-                <label className="flex cursor-pointer items-start gap-3 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={ocultarContato}
-                    onChange={(e) => setOcultarContato(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-primary"
-                  />
-                  <span>
+                <div className="flex items-start justify-between gap-4 text-sm">
+                  <label htmlFor="ocultar-contato" className="cursor-pointer">
                     Ocultar telefone/e-mail do candidato
                     <span className="block text-xs text-muted-foreground">
                       A linha de contato do candidato não aparece no currículo padronizado.
                     </span>
-                  </span>
-                </label>
-                <label className="flex cursor-pointer items-start gap-3 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={contatosErs}
-                    onChange={(e) => setContatosErs(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-primary"
+                  </label>
+                  <Switch
+                    id="ocultar-contato"
+                    checked={ocultarContato}
+                    onCheckedChange={setOcultarContato}
+                    showIcons
+                    haptic="light"
+                    aria-label="Ocultar telefone e e-mail do candidato"
                   />
-                  <span>
+                </div>
+                <div className="flex items-start justify-between gap-4 text-sm">
+                  <label htmlFor="contatos-ers" className="cursor-pointer">
                     Inserir contatos da Elizabete
                     <span className="block text-xs text-muted-foreground">
                       Usa {CONTATO_ERS.telefone} e {CONTATO_ERS.email} no lugar dos do candidato.
                     </span>
-                  </span>
-                </label>
+                  </label>
+                  <Switch
+                    id="contatos-ers"
+                    checked={contatosErs}
+                    onCheckedChange={setContatosErs}
+                    showIcons
+                    haptic="light"
+                    aria-label="Inserir contatos da Elizabete"
+                  />
+                </div>
               </div>
 
               <Button
@@ -650,18 +655,20 @@ function TalentaApp() {
                 ajuda: arquivoDisc ? arquivoDisc.name : "Nenhum arquivo anexado na aba DISC.",
               },
             ].map((opcao) => (
-              <label key={opcao.rotulo} className="flex cursor-pointer items-start gap-3 text-sm">
-                <input
-                  type="checkbox"
-                  checked={opcao.marcado}
-                  onChange={(e) => opcao.alterar(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 accent-primary"
-                />
-                <span>
+              <div key={opcao.rotulo} className="flex items-start justify-between gap-4 text-sm">
+                <label htmlFor={`exportar-${opcao.rotulo.toLowerCase()}`} className="cursor-pointer">
                   {opcao.rotulo}
                   <span className="block text-xs text-muted-foreground">{opcao.ajuda}</span>
-                </span>
-              </label>
+                </label>
+                <Switch
+                  id={`exportar-${opcao.rotulo.toLowerCase()}`}
+                  checked={opcao.marcado}
+                  onCheckedChange={opcao.alterar}
+                  showIcons
+                  haptic="light"
+                  aria-label={`Incluir ${opcao.rotulo} na exportação`}
+                />
+              </div>
             ))}
           </div>
 
